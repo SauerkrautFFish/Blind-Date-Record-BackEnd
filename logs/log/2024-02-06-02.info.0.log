@@ -1,0 +1,14 @@
+2024-02-06 02:34:54.742 [main] INFO  edu.fish.blinddate.BlindDateRecordPlatformApplication.logStarting:50 - Starting BlindDateRecordPlatformApplication using Java 17.0.9 with PID 15400 (F:\git_project\Blind-Date-Record-Platform\target\classes started by Knight in F:\git_project\Blind-Date-Record-Platform)
+2024-02-06 02:34:54.745 [main] INFO  edu.fish.blinddate.BlindDateRecordPlatformApplication.logStartupProfileInfo:654 - No active profile set, falling back to 1 default profile: "default"
+2024-02-06 02:34:55.298 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer.initialize:109 - Tomcat initialized with port 8080 (http)
+2024-02-06 02:34:55.310 [main] INFO  org.apache.coyote.http11.Http11NioProtocol.log:173 - Initializing ProtocolHandler ["http-nio-8080"]
+2024-02-06 02:34:55.312 [main] INFO  org.apache.catalina.core.StandardService.log:173 - Starting service [Tomcat]
+2024-02-06 02:34:55.313 [main] INFO  org.apache.catalina.core.StandardEngine.log:173 - Starting Servlet engine: [Apache Tomcat/10.1.18]
+2024-02-06 02:34:55.351 [main] INFO  o.a.catalina.core.ContainerBase.[Tomcat].[localhost].[/].log:173 - Initializing Spring embedded WebApplicationContext
+2024-02-06 02:34:55.352 [main] INFO  o.s.b.w.s.context.ServletWebServerApplicationContext.prepareWebApplicationContext:296 - Root WebApplicationContext: initialization completed in 575 ms
+2024-02-06 02:34:55.565 [main] INFO  org.apache.coyote.http11.Http11NioProtocol.log:173 - Starting ProtocolHandler ["http-nio-8080"]
+2024-02-06 02:34:55.579 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer.start:241 - Tomcat started on port 8080 (http) with context path ''
+2024-02-06 02:34:55.591 [main] INFO  edu.fish.blinddate.BlindDateRecordPlatformApplication.logStarted:56 - Started BlindDateRecordPlatformApplication in 1.182 seconds (process running for 1.536)
+2024-02-06 02:34:57.702 [http-nio-8080-exec-1] INFO  o.a.catalina.core.ContainerBase.[Tomcat].[localhost].[/].log:173 - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-02-06 02:34:57.703 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet.initServletBean:532 - Initializing Servlet 'dispatcherServlet'
+2024-02-06 02:34:57.703 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet.initServletBean:554 - Completed initialization in 0 ms
