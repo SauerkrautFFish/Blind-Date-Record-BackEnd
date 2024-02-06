@@ -12,6 +12,10 @@ public class BaseResponse<T> implements Serializable {
     private final String message;
     private final T data;
 
+    private BaseResponse() {
+        throw new UnsupportedOperationException();
+    }
+
     private BaseResponse(Integer code) {
         this(code, null, null);
     }

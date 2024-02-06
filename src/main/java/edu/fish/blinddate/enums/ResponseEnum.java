@@ -11,15 +11,13 @@ public enum ResponseEnum {
     //-1 服务器错误
     SYSTEM_ERROR(-1, "系统异常!"),
 
-    //-2x 参数校验
+    //-2x 业务错误
     EMAIL_NULL_INCORRECT(-21, "邮箱地址不能为空!"),
-    EMAIL_FORMAT_INCORRECT(-22, "邮箱地址格式不正确!"),
-    MISSING_PARAMS(-23, "参数缺失, 请输入完整!"),
-    TOKEN_EXPIRE(-24, "状态已失效, 请重新登录!"),
+    MISSING_PARAMS(-22, "参数缺失, 请输入完整!"),
+    TOKEN_EXPIRE(-23, "状态已失效, 请重新登录!"),
 
-    //-3x 业务错误
-    ACCOUNT_EXISTS(-31, "该账号已存在!"),
-    ACCOUNT_NOT_EXISTS_OR_PASSWORD_ERR(32, "账号不存在或密码错误!"),
+    ACCOUNT_EXISTS(-24, "该账号已存在!"),
+    ACCOUNT_NOT_EXISTS_OR_PASSWORD_ERR(25, "账号不存在或密码错误!"),
 
 
     ;

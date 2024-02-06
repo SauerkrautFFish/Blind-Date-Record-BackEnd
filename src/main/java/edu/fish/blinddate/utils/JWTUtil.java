@@ -16,11 +16,14 @@ import java.util.Date;
 public class JWTUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginInterceptor.class);
-    public static final long EXPIRE = 1000 * 60 * 60 * 2; // token过期时间
-    public static final String APP_SECRET = "ukBfda1fDa2dDaZd24asFfWuWs2jZWLZHO"; //秘钥
+    public static final long EXPIRE = 1000 * 60 * 60 * 2;
+    public static final String APP_SECRET = "ukBfda1fDa2dDaZd24asFfWuWs2jZWLZHO";
     public static final Key signKey = new SecretKeySpec(APP_SECRET.getBytes(), SignatureAlgorithm.HS256.getJcaName());
 
-    //生成token字符串的方法
+    private JWTUtil() {
+        throw new UnsupportedOperationException();
+    }
+
     public static String getJwtToken(Integer id) {
 
         return Jwts.builder()
@@ -36,11 +39,6 @@ public class JWTUtil {
                 .compact();
     }
 
-    /**
-     * 根据token字符串获取用户id
-     * @param jwtToken
-     * @return
-     */
     public static Integer getUserIdByJwtToken(String jwtToken) {
         if(jwtToken == null) return null;
 
@@ -49,10 +47,8 @@ public class JWTUtil {
 
             Claims claims = claimsJws.getBody();
             return (Integer) claims.get("id");
-        } catch (ExpiredJwtException e) {
-            // log
-        } catch (SignatureException e) {
-            // 日志
+        } catch (ExpiredJwtException | SignatureException e) {
+            // 过期 or 不符合预期的token
         } catch (Exception e) {
             logger.error("jwt error, input param = {}, error msg = {}", jwtToken, e.getMessage());
         }

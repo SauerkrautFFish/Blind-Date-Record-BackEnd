@@ -1,9 +1,12 @@
 package edu.fish.blinddate.controller;
 
 import edu.fish.blinddate.enums.ResponseEnum;
+import edu.fish.blinddate.exception.BaseException;
 import edu.fish.blinddate.response.BaseResponse;
 import edu.fish.blinddate.service.MainService;
 import edu.fish.blinddate.utils.JWTUtil;
+import edu.fish.blinddate.vo.BlindDateRecordVO;
+import edu.fish.blinddate.vo.CandidateVO;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,57 +14,117 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.function.Supplier;
+
 @RestController
 @RequestMapping("/api")
 public class MainController {
 
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
+    private static final Supplier<Long> consumeTimer = System::currentTimeMillis;
+
     @Resource
     MainService mainService;
 
     @RequestMapping(path = "/register", method = RequestMethod.POST)
     public BaseResponse<Object> register(String newAccount, String newPassword, String userName) {
-        // 参数校验
-        if (newAccount == null || newPassword == null || userName == null) {
-            return BaseResponse.set(ResponseEnum.MISSING_PARAMS);
-        }
-
         try {
-            boolean isRegister = mainService.registerUser(newAccount, newPassword, userName);
-            // 没有注册成功 代表账号存在
-            if (!isRegister) {
-                return BaseResponse.set(ResponseEnum.ACCOUNT_EXISTS);
+            if (newAccount == null || newPassword == null || userName == null) {
+                throw new BaseException(ResponseEnum.MISSING_PARAMS);
             }
 
+            mainService.registerUser(newAccount, newPassword, userName);
+
             return BaseResponse.success();
+        } catch (BaseException e) {
+            return BaseResponse.set(e.getCodeAndMsg());
         } catch (Exception e) {
-            logger.error("system error, input params: {}, {}, {}", newAccount, newPassword, userName);
+            logger.error("system error, input params: newAccount={}, newPassword={}, userName={}. error msg: {}", newAccount, newPassword, userName, e);
             return BaseResponse.error();
         }
     }
 
     @RequestMapping(path = "/login", method = RequestMethod.POST)
     public BaseResponse<String> login(String account, String password) {
-        // 参数校验
-        if (account == null || password == null) {
-            return BaseResponse.set(ResponseEnum.MISSING_PARAMS);
-        }
-
         try {
-            Integer userId = mainService.userLogin(account, password);
-            // 没有拿到userId代表登录失败
-            if (userId == null) {
-                return BaseResponse.set(ResponseEnum.ACCOUNT_NOT_EXISTS_OR_PASSWORD_ERR);
+            if (account == null || password == null) {
+                throw new BaseException(ResponseEnum.MISSING_PARAMS);
             }
 
-            // 给予token
+            Integer userId = mainService.userLogin(account, password);
+
             String token = JWTUtil.getJwtToken(userId);
             return BaseResponse.successData(token);
+        } catch (BaseException e) {
+            return BaseResponse.set(e.getCodeAndMsg());
         } catch (Exception e) {
-            logger.error("system error, input params: {}, {}", account, password);
+            logger.error("system error, input params: account={}, password={}. error msg: {}", account, password, e);
             return BaseResponse.error();
         }
 
+    }
+
+    @RequestMapping(path = "/getCandidateList", method = RequestMethod.GET)
+    public BaseResponse<List<CandidateVO>> getCandidateList(Integer userId) {
+        try {
+            List<CandidateVO> candidateVOList = mainService.getCandidateListByUserId(userId);
+            return BaseResponse.successData(candidateVOList);
+        } catch (Exception e) {
+            logger.error("system error, input params: userId={}. error msg: {}", userId, e);
+            return BaseResponse.error();
+        }
+    }
+
+    @RequestMapping(path = "/addCandidate", method = RequestMethod.POST)
+    public BaseResponse<Object> addCandidate(Integer userId, String candidateName) {
+        try {
+            if (candidateName == null) {
+                throw new BaseException(ResponseEnum.MISSING_PARAMS);
+            }
+
+            mainService.addCandidateWithUserId(userId, candidateName);
+            return BaseResponse.success();
+        } catch (BaseException e) {
+            return BaseResponse.set(e.getCodeAndMsg());
+        }  catch (Exception e) {
+            logger.error("system error, input params: userId={}, candidateName={}. error msg: {}", userId, candidateName, e);
+            return BaseResponse.error();
+        }
+    }
+
+    @RequestMapping(path = "/getCandidateBlindRecord", method = RequestMethod.GET)
+    public BaseResponse<BlindDateRecordVO> getCandidateBlindRecord(Integer userId, Integer candidateId) {
+        try {
+            if (candidateId == null) {
+                throw new BaseException(ResponseEnum.MISSING_PARAMS);
+            }
+
+            BlindDateRecordVO blindDateRecordVO = mainService.getCandidateBlindRecord(userId, candidateId);
+            return BaseResponse.successData(blindDateRecordVO);
+        } catch (BaseException e) {
+            return BaseResponse.set(e.getCodeAndMsg());
+        }  catch (Exception e) {
+            logger.error("system error, input params: userId={}, candidateId={}. error msg: {}", userId, candidateId, e);
+            return BaseResponse.error();
+        }
+    }
+
+    @RequestMapping(path = "/setCandidateBlindRecord", method = RequestMethod.GET)
+    public BaseResponse<BlindDateRecordVO> setCandidateBlindRecord(Integer userId, BlindDateRecordVO blindDateRecordVO) {
+        try {
+            if (blindDateRecordVO == null) {
+                throw new BaseException(ResponseEnum.MISSING_PARAMS);
+            }
+
+            mainService.setCandidateBlindRecord(blindDateRecordVO);
+            return BaseResponse.success();
+        } catch (BaseException e) {
+            return BaseResponse.set(e.getCodeAndMsg());
+        }  catch (Exception e) {
+            logger.error("system error, input params: userId={}, blindDateRecordVO={}. error msg: {}", userId, blindDateRecordVO, e);
+            return BaseResponse.error();
+        }
     }
 }
