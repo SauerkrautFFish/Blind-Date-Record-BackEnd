@@ -1,6 +1,5 @@
 package edu.fish.blinddate.controller;
 
-import edu.fish.blinddate.enums.ResponseEnum;
 import edu.fish.blinddate.exception.BaseException;
 import edu.fish.blinddate.response.BaseResponse;
 import edu.fish.blinddate.service.MainService;
@@ -12,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -31,10 +31,6 @@ public class MainController {
     @RequestMapping(path = "/register", method = RequestMethod.POST)
     public BaseResponse<Object> register(String newAccount, String newPassword, String userName) {
         try {
-            if (newAccount == null || newPassword == null || userName == null) {
-                throw new BaseException(ResponseEnum.MISSING_PARAMS);
-            }
-
             mainService.registerUser(newAccount, newPassword, userName);
 
             return BaseResponse.success();
@@ -49,12 +45,7 @@ public class MainController {
     @RequestMapping(path = "/login", method = RequestMethod.POST)
     public BaseResponse<String> login(String account, String password) {
         try {
-            if (account == null || password == null) {
-                throw new BaseException(ResponseEnum.MISSING_PARAMS);
-            }
-
             Integer userId = mainService.userLogin(account, password);
-
             String token = JWTUtil.getJwtToken(userId);
             return BaseResponse.successData(token);
         } catch (BaseException e) {
@@ -80,10 +71,6 @@ public class MainController {
     @RequestMapping(path = "/addCandidate", method = RequestMethod.POST)
     public BaseResponse<Object> addCandidate(Integer userId, String candidateName) {
         try {
-            if (candidateName == null) {
-                throw new BaseException(ResponseEnum.MISSING_PARAMS);
-            }
-
             mainService.addCandidateWithUserId(userId, candidateName);
             return BaseResponse.success();
         } catch (BaseException e) {
@@ -97,10 +84,6 @@ public class MainController {
     @RequestMapping(path = "/getCandidateBlindRecord", method = RequestMethod.GET)
     public BaseResponse<BlindDateRecordVO> getCandidateBlindRecord(Integer userId, Integer candidateId) {
         try {
-            if (candidateId == null) {
-                throw new BaseException(ResponseEnum.MISSING_PARAMS);
-            }
-
             BlindDateRecordVO blindDateRecordVO = mainService.getCandidateBlindRecord(userId, candidateId);
             return BaseResponse.successData(blindDateRecordVO);
         } catch (BaseException e) {
@@ -111,19 +94,41 @@ public class MainController {
         }
     }
 
-    @RequestMapping(path = "/setCandidateBlindRecord", method = RequestMethod.GET)
+    @RequestMapping(path = "/setCandidateBlindRecord", method = RequestMethod.POST)
     public BaseResponse<BlindDateRecordVO> setCandidateBlindRecord(Integer userId, BlindDateRecordVO blindDateRecordVO) {
         try {
-            if (blindDateRecordVO == null) {
-                throw new BaseException(ResponseEnum.MISSING_PARAMS);
-            }
-
             mainService.setCandidateBlindRecord(blindDateRecordVO);
             return BaseResponse.success();
         } catch (BaseException e) {
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
             logger.error("system error, input params: userId={}, blindDateRecordVO={}. error msg: {}", userId, blindDateRecordVO, e);
+            return BaseResponse.error();
+        }
+    }
+
+    @RequestMapping(path = "/getFocusOnYouRank", method = RequestMethod.GET)
+    public BaseResponse<List<String>> getFocusOnYouRank(Integer userId, @RequestParam(name = "rankingListLength", defaultValue = "5") Integer rankingListLength) {
+        try {
+            List<String> nameList = mainService.getFocusOnRank(userId,false, rankingListLength);
+            return BaseResponse.successData(nameList);
+        } catch (BaseException e) {
+            return BaseResponse.set(e.getCodeAndMsg());
+        }  catch (Exception e) {
+            logger.error("system error, input params: userId={}, rankingListLength={}. error msg: {}", userId, rankingListLength, e);
+            return BaseResponse.error();
+        }
+    }
+
+    @RequestMapping(path = "/getYouFocusOnRank", method = RequestMethod.GET)
+    public BaseResponse<List<String>> getYouFocusOnRank(Integer userId, @RequestParam(name = "rankingListLength", defaultValue = "5") Integer rankingListLength) {
+        try {
+            List<String> nameList = mainService.getFocusOnRank(userId, true, rankingListLength);
+            return BaseResponse.successData(nameList);
+        } catch (BaseException e) {
+            return BaseResponse.set(e.getCodeAndMsg());
+        }  catch (Exception e) {
+            logger.error("system error, input params: userId={}, rankingListLength={}. error msg: {}", userId, rankingListLength, e);
             return BaseResponse.error();
         }
     }

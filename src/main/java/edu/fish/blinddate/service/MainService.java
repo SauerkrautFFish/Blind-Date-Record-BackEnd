@@ -13,9 +13,11 @@ public interface MainService {
 
     List<CandidateVO> getCandidateListByUserId(Integer userId);
 
-    void addCandidateWithUserId(Integer userId, String candidateName);
+    void addCandidateWithUserId(Integer userId, String candidateName) throws BaseException;
 
-    BlindDateRecordVO getCandidateBlindRecord(Integer userId, Integer candidateId);
+    BlindDateRecordVO getCandidateBlindRecord(Integer userId, Integer candidateId) throws BaseException;
 
-    void setCandidateBlindRecord(BlindDateRecordVO blindDateRecordVO);
+    void setCandidateBlindRecord(BlindDateRecordVO blindDateRecordVO) throws BaseException;
+
+    List<String> getFocusOnRank(Integer userId, boolean you, int rankingListLength) throws BaseException;
 }
