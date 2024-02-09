@@ -132,4 +132,17 @@ public class MainController {
             return BaseResponse.error();
         }
     }
+
+    @RequestMapping(path = "/analyzeCandidate", method = RequestMethod.GET)
+    public BaseResponse<String> getAnalyzeCandidateReport(Integer userId, Integer candidateId) {
+        try {
+            String textReport = mainService.getCandidateAnalysisReport(userId, candidateId);
+            return BaseResponse.successData(textReport);
+        } catch (BaseException e) {
+            return BaseResponse.set(e.getCodeAndMsg());
+        }  catch (Exception e) {
+            logger.error("system error, input params: userId={}, candidateId={}. error msg: {}", userId, candidateId, e);
+            return BaseResponse.error();
+        }
+    }
 }

@@ -20,4 +20,6 @@ public interface MainService {
     void setCandidateBlindRecord(BlindDateRecordVO blindDateRecordVO) throws BaseException;
 
     List<String> getFocusOnRank(Integer userId, boolean you, int rankingListLength) throws BaseException;
+
+    String getCandidateAnalysisReport(Integer userId, Integer candidateId) throws BaseException;
 }

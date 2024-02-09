@@ -6,14 +6,18 @@ import edu.fish.blinddate.entity.Candidate;
 import edu.fish.blinddate.entity.OneRecord;
 import edu.fish.blinddate.entity.User;
 import edu.fish.blinddate.enums.ResponseEnum;
+import edu.fish.blinddate.enums.Role;
 import edu.fish.blinddate.exception.BaseException;
+import edu.fish.blinddate.gpt.GeminiProModel;
 import edu.fish.blinddate.repository.BlindDateRecordRepository;
 import edu.fish.blinddate.repository.CandidateRepository;
 import edu.fish.blinddate.repository.UserRepository;
 import edu.fish.blinddate.service.MainService;
+import edu.fish.blinddate.utils.TemplateUtil;
 import edu.fish.blinddate.vo.BlindDateRecordVO;
 import edu.fish.blinddate.vo.CandidateVO;
 import jakarta.annotation.Resource;
+import org.apache.hc.core5.http.HttpHost;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Example;
@@ -187,14 +191,13 @@ public class MainServiceImpl implements MainService {
                 // 如果是你在意谁排行榜 主要看你邀请的次数 + 你赴约的百分比
                 cnt = this.calculateTryCnt(userRecord);
                 successRate = this.calculateSuccessRate(candidateRecord);
-                int score = cnt + successRate.multiply(BigDecimal.valueOf(10000)).intValue();
             } else {
                 // 如果是谁在意你排行榜 主要看她邀请你的次数 + 赴约你的百分比
                  cnt = this.calculateTryCnt(candidateRecord);
                  successRate = this.calculateSuccessRate(userRecord);
             }
 
-            int score = cnt + successRate.multiply(BigDecimal.valueOf(10000)).intValue();
+            int score = this.calculateScore(cnt, successRate);
             candidateMapScoreList.add(Pair.of(dto.getCandidateName(), score));
         });
 
@@ -206,6 +209,50 @@ public class MainServiceImpl implements MainService {
         });
 
         return candidateMapScoreList.stream().map(Pair::getFirst).toList().subList(0, rankingListLength);
+    }
+
+    private int calculateScore(int cnt, BigDecimal successRate) {
+        return cnt + successRate.multiply(BigDecimal.valueOf(10000)).intValue();
+    }
+
+    @Override
+    public String getCandidateAnalysisReport(Integer userId, Integer candidateId) throws BaseException {
+        if (candidateId == null) {
+            throw new BaseException(ResponseEnum.MISSING_PARAMS);
+        }
+
+        BlindDateRecordVO candidateBlindRecord = this.getCandidateBlindRecord(userId, candidateId);
+
+        List<OneRecord> candidateRecordList = candidateBlindRecord.getCandidateRecord();
+        List<OneRecord> userRecordList = candidateBlindRecord.getUserRecord();
+
+        // 尝试约会次数
+        int candidateCnt = this.calculateTryCnt(candidateRecordList);
+        int userCnt = this.calculateTryCnt(userRecordList);
+        // 约会成功率
+        BigDecimal candidateSuccessRate = this.calculateSuccessRate(candidateRecordList);
+        BigDecimal userSuccessRate = this.calculateSuccessRate(userRecordList);
+
+        StringBuilder candidateStr = new StringBuilder();
+        candidateRecordList.forEach(oneRecord -> {
+            candidateStr.append(TemplateUtil.singleCandidateAnalysisTemplatePart1(candidateStr, oneRecord, Role.CANDIDATE));
+        });
+
+        StringBuilder userStr = new StringBuilder();
+        userRecordList.forEach(oneRecord -> {
+            userStr.append(TemplateUtil.singleCandidateAnalysisTemplatePart1(userStr, oneRecord, Role.USER));
+        });
+
+        TemplateUtil.singleCandidateAnalysisTemplatePart2(candidateStr, candidateCnt, candidateSuccessRate, Role.CANDIDATE);
+        TemplateUtil.singleCandidateAnalysisTemplatePart2(candidateStr, userCnt, userSuccessRate, Role.USER);
+
+        String promptAndMSg = TemplateUtil.singleCandidateAnalysisTemplatePart3(userStr, candidateStr);
+
+        // send
+        GeminiProModel geminiPro = GeminiProModel.builder().init().proxy(new HttpHost("localhost", 7890));
+        String responseText = geminiPro.generateTextOnce(promptAndMSg);
+
+        return responseText;
     }
 
     private BigDecimal calculateSuccessRate(List<OneRecord> record) {
