@@ -4,21 +4,21 @@ import edu.fish.blinddate.exception.BaseException;
 import edu.fish.blinddate.response.BaseResponse;
 import edu.fish.blinddate.service.MainService;
 import edu.fish.blinddate.utils.JWTUtil;
+import edu.fish.blinddate.utils.UserContext;
 import edu.fish.blinddate.vo.BlindDateRecordVO;
 import edu.fish.blinddate.vo.CandidateVO;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.function.Supplier;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "*")
 public class MainController {
 
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
@@ -37,7 +37,7 @@ public class MainController {
         } catch (BaseException e) {
             return BaseResponse.set(e.getCodeAndMsg());
         } catch (Exception e) {
-            logger.error("system error, input params: newAccount={}, newPassword={}, userName={}. error msg: {}", newAccount, newPassword, userName, e);
+            logger.error("system error, input params: newAccount={}, newPassword={}, userName={}. error msg: {}", newAccount, newPassword, userName, e.getMessage());
             return BaseResponse.error();
         }
     }
@@ -51,19 +51,24 @@ public class MainController {
         } catch (BaseException e) {
             return BaseResponse.set(e.getCodeAndMsg());
         } catch (Exception e) {
-            logger.error("system error, input params: account={}, password={}. error msg: {}", account, password, e);
+            logger.error("system error, input params: account={}, password={}. error msg: {}", account, password, e.getMessage());
             return BaseResponse.error();
         }
 
     }
 
+    private Integer getUserIdFromRequest(HttpServletRequest request) {
+        return Integer.valueOf(request.getParameter("userId"));
+    }
+
     @RequestMapping(path = "/getCandidateList", method = RequestMethod.GET)
-    public BaseResponse<List<CandidateVO>> getCandidateList(Integer userId) {
+    public BaseResponse<List<CandidateVO>> getCandidateList() {
+        Integer userId = UserContext.getUserId();
         try {
             List<CandidateVO> candidateVOList = mainService.getCandidateListByUserId(userId);
             return BaseResponse.successData(candidateVOList);
         } catch (Exception e) {
-            logger.error("system error, input params: userId={}. error msg: {}", userId, e);
+            logger.error("system error, input params: userId={}. error msg: {}", userId, e.getMessage());
             return BaseResponse.error();
         }
     }
@@ -76,7 +81,7 @@ public class MainController {
         } catch (BaseException e) {
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
-            logger.error("system error, input params: userId={}, candidateName={}. error msg: {}", userId, candidateName, e);
+            logger.error("system error, input params: userId={}, candidateName={}. error msg: {}", userId, candidateName, e.getMessage());
             return BaseResponse.error();
         }
     }
@@ -89,7 +94,7 @@ public class MainController {
         } catch (BaseException e) {
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
-            logger.error("system error, input params: userId={}, candidateId={}. error msg: {}", userId, candidateId, e);
+            logger.error("system error, input params: userId={}, candidateId={}. error msg: {}", userId, candidateId, e.getMessage());
             return BaseResponse.error();
         }
     }
@@ -102,7 +107,7 @@ public class MainController {
         } catch (BaseException e) {
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
-            logger.error("system error, input params: userId={}, blindDateRecordVO={}. error msg: {}", userId, blindDateRecordVO, e);
+            logger.error("system error, input params: userId={}, blindDateRecordVO={}. error msg: {}", userId, blindDateRecordVO, e.getMessage());
             return BaseResponse.error();
         }
     }
@@ -115,7 +120,7 @@ public class MainController {
         } catch (BaseException e) {
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
-            logger.error("system error, input params: userId={}, rankingListLength={}. error msg: {}", userId, rankingListLength, e);
+            logger.error("system error, input params: userId={}, rankingListLength={}. error msg: {}", userId, rankingListLength, e.getMessage());
             return BaseResponse.error();
         }
     }
@@ -128,7 +133,7 @@ public class MainController {
         } catch (BaseException e) {
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
-            logger.error("system error, input params: userId={}, rankingListLength={}. error msg: {}", userId, rankingListLength, e);
+            logger.error("system error, input params: userId={}, rankingListLength={}. error msg: {}", userId, rankingListLength, e.getMessage());
             return BaseResponse.error();
         }
     }
@@ -141,7 +146,7 @@ public class MainController {
         } catch (BaseException e) {
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
-            logger.error("system error, input params: userId={}, candidateId={}. error msg: {}", userId, candidateId, e);
+            logger.error("system error, input params: userId={}, candidateId={}. error msg: {}", userId, candidateId, e.getMessage());
             return BaseResponse.error();
         }
     }
