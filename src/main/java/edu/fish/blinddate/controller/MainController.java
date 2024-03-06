@@ -74,7 +74,8 @@ public class MainController {
     }
 
     @RequestMapping(path = "/addCandidate", method = RequestMethod.POST)
-    public BaseResponse<Object> addCandidate(Integer userId, String candidateName) {
+    public BaseResponse<Object> addCandidate(String candidateName) {
+        Integer userId = UserContext.getUserId();
         try {
             mainService.addCandidateWithUserId(userId, candidateName);
             return BaseResponse.success();
@@ -87,7 +88,8 @@ public class MainController {
     }
 
     @RequestMapping(path = "/getCandidateBlindRecord", method = RequestMethod.GET)
-    public BaseResponse<BlindDateRecordVO> getCandidateBlindRecord(Integer userId, Integer candidateId) {
+    public BaseResponse<BlindDateRecordVO> getCandidateBlindRecord(Integer candidateId) {
+        Integer userId = UserContext.getUserId();
         try {
             BlindDateRecordVO blindDateRecordVO = mainService.getCandidateBlindRecord(userId, candidateId);
             return BaseResponse.successData(blindDateRecordVO);
@@ -100,7 +102,8 @@ public class MainController {
     }
 
     @RequestMapping(path = "/setCandidateBlindRecord", method = RequestMethod.POST)
-    public BaseResponse<BlindDateRecordVO> setCandidateBlindRecord(Integer userId, BlindDateRecordVO blindDateRecordVO) {
+    public BaseResponse<BlindDateRecordVO> setCandidateBlindRecord(BlindDateRecordVO blindDateRecordVO) {
+        Integer userId = UserContext.getUserId();
         try {
             mainService.setCandidateBlindRecord(blindDateRecordVO);
             return BaseResponse.success();
@@ -113,9 +116,10 @@ public class MainController {
     }
 
     @RequestMapping(path = "/getFocusOnYouRank", method = RequestMethod.GET)
-    public BaseResponse<List<String>> getFocusOnYouRank(Integer userId, @RequestParam(name = "rankingListLength", defaultValue = "5") Integer rankingListLength) {
+    public BaseResponse<List<String>> getFocusOnYouRank(@RequestParam(name = "rankingListLength", defaultValue = "5") Integer rankingListLength) {
+        Integer userId = UserContext.getUserId();
         try {
-            List<String> nameList = mainService.getFocusOnRank(userId,false, rankingListLength);
+            List<String> nameList = mainService.getFocusOnRank(userId, false, rankingListLength);
             return BaseResponse.successData(nameList);
         } catch (BaseException e) {
             return BaseResponse.set(e.getCodeAndMsg());
@@ -126,7 +130,8 @@ public class MainController {
     }
 
     @RequestMapping(path = "/getYouFocusOnRank", method = RequestMethod.GET)
-    public BaseResponse<List<String>> getYouFocusOnRank(Integer userId, @RequestParam(name = "rankingListLength", defaultValue = "5") Integer rankingListLength) {
+    public BaseResponse<List<String>> getYouFocusOnRank(@RequestParam(name = "rankingListLength", defaultValue = "5") Integer rankingListLength) {
+        Integer userId = UserContext.getUserId();
         try {
             List<String> nameList = mainService.getFocusOnRank(userId, true, rankingListLength);
             return BaseResponse.successData(nameList);
@@ -139,7 +144,8 @@ public class MainController {
     }
 
     @RequestMapping(path = "/analyzeCandidate", method = RequestMethod.GET)
-    public BaseResponse<String> getAnalyzeCandidateReport(Integer userId, Integer candidateId) {
+    public BaseResponse<String> getAnalyzeCandidateReport(Integer candidateId) {
+        Integer userId = UserContext.getUserId();
         try {
             String textReport = mainService.getCandidateAnalysisReport(userId, candidateId);
             return BaseResponse.successData(textReport);
