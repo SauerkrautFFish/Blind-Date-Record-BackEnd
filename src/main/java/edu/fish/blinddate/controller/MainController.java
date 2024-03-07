@@ -105,7 +105,7 @@ public class MainController {
     public BaseResponse<BlindDateRecordVO> setCandidateBlindRecord(BlindDateRecordVO blindDateRecordVO) {
         Integer userId = UserContext.getUserId();
         try {
-            mainService.setCandidateBlindRecord(blindDateRecordVO);
+            mainService.setCandidateBlindRecord(userId, blindDateRecordVO);
             return BaseResponse.success();
         } catch (BaseException e) {
             return BaseResponse.set(e.getCodeAndMsg());

@@ -20,6 +20,7 @@ public enum ResponseEnum {
     ACCOUNT_NOT_EXISTS_OR_PASSWORD_ERR(25, "账号不存在或密码错误!"),
 
     GPT_CALLED_ERROR(26, "GPT调用异常"),
+    CANDIDATE_DONT_EXISTS(27, "候选人不存在"),
     ;
 
     private final int code;

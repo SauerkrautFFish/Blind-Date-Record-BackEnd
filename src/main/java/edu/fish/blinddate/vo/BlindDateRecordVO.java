@@ -8,7 +8,6 @@ import java.util.List;
 @Data
 public class BlindDateRecordVO {
     private Integer id;
-    private Integer userId;
     private Integer candidateId;
     private List<OneRecord> userRecord;
     private List<OneRecord> candidateRecord;

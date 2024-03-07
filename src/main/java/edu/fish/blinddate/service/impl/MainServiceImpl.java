@@ -1,5 +1,6 @@
 package edu.fish.blinddate.service.impl;
 
+import com.alibaba.fastjson2.util.DateUtils;
 import edu.fish.blinddate.dto.BlindDateRecordDTO;
 import edu.fish.blinddate.entity.BlindDateRecord;
 import edu.fish.blinddate.entity.Candidate;
@@ -84,11 +85,13 @@ public class MainServiceImpl implements MainService {
         Example<Candidate> example = Example.of(query);
         List<Candidate> candidateList = candidateRepository.findAll(example);
 
+
         List<CandidateVO> candidateVOList = new ArrayList<>();
         // 如果查询不到 candidateList = []
         candidateList.forEach(candidate -> {
             CandidateVO candidateVO = new CandidateVO();
             BeanUtils.copyProperties(candidate, candidateVO);
+            candidateVO.setCreateTime(DateUtils.format(candidate.getCreateTime()));
             candidateVOList.add(candidateVO);
         });
 
@@ -128,20 +131,27 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public void setCandidateBlindRecord(BlindDateRecordVO blindDateRecordVO) throws BaseException {
-        if (blindDateRecordVO == null) {
+    public void setCandidateBlindRecord(Integer userId, BlindDateRecordVO blindDateRecordVO) throws BaseException {
+        if (blindDateRecordVO == null || blindDateRecordVO.getId() == null ||
+                blindDateRecordVO.getCandidateRecord() == null ||
+                blindDateRecordVO.getUserRecord() == null) {
             throw new BaseException(ResponseEnum.MISSING_PARAMS);
         }
 
-        if (!CollectionUtils.isEmpty(blindDateRecordVO.getUserRecord())) {
-            Collections.sort(blindDateRecordVO.getUserRecord());
+        BlindDateRecord query = new BlindDateRecord();
+        query.setUserId(userId);
+        query.setCandidateId(blindDateRecordVO.getCandidateId());
+        Example<BlindDateRecord> example = Example.of(query);
+
+        // 判断下是否是该用户的候选人
+        BlindDateRecord blindDateRecord = blindDateRecordRepository.findOne(example).orElse(null);
+        if(blindDateRecord == null) {
+            throw new BaseException(ResponseEnum.CANDIDATE_DONT_EXISTS);
         }
 
-        if (!CollectionUtils.isEmpty(blindDateRecordVO.getCandidateRecord())) {
-            Collections.sort(blindDateRecordVO.getCandidateRecord());
-        }
+        Collections.sort(blindDateRecordVO.getUserRecord());
+        Collections.sort(blindDateRecordVO.getCandidateRecord());
 
-        BlindDateRecord blindDateRecord = new BlindDateRecord();
         BeanUtils.copyProperties(blindDateRecordVO, blindDateRecord);
         blindDateRecordRepository.save(blindDateRecord);
     }

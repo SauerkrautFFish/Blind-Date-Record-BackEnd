@@ -17,7 +17,7 @@ public interface MainService {
 
     BlindDateRecordVO getCandidateBlindRecord(Integer userId, Integer candidateId) throws BaseException;
 
-    void setCandidateBlindRecord(BlindDateRecordVO blindDateRecordVO) throws BaseException;
+    void setCandidateBlindRecord(Integer userId, BlindDateRecordVO blindDateRecordVO) throws BaseException;
 
     List<String> getFocusOnRank(Integer userId, boolean you, int rankingListLength) throws BaseException;
 
