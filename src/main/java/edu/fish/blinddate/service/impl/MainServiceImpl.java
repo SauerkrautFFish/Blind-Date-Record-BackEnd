@@ -1,6 +1,7 @@
 package edu.fish.blinddate.service.impl;
 
 import com.alibaba.fastjson2.util.DateUtils;
+import com.google.common.collect.Lists;
 import edu.fish.blinddate.dto.BlindDateRecordDTO;
 import edu.fish.blinddate.entity.BlindDateRecord;
 import edu.fish.blinddate.entity.Candidate;
@@ -86,7 +87,7 @@ public class MainServiceImpl implements MainService {
         List<Candidate> candidateList = candidateRepository.findAll(example);
 
 
-        List<CandidateVO> candidateVOList = new ArrayList<>();
+        List<CandidateVO> candidateVOList = Lists.newArrayList();
         // 如果查询不到 candidateList = []
         candidateList.forEach(candidate -> {
             CandidateVO candidateVO = new CandidateVO();
@@ -108,6 +109,14 @@ public class MainServiceImpl implements MainService {
         candidate.setUserId(userId);
         candidate.setName(candidateName);
         candidateRepository.save(candidate);
+
+        BlindDateRecord blindDateRecord = new BlindDateRecord();
+        blindDateRecord.setUserId(userId);
+        blindDateRecord.setCandidateId(candidate.getId());
+        blindDateRecord.setUserRecord(Lists.newArrayList());
+        blindDateRecord.setCandidateRecord(Lists.newArrayList());
+        blindDateRecordRepository.save(blindDateRecord);
+
     }
 
     @Override
@@ -123,7 +132,7 @@ public class MainServiceImpl implements MainService {
         BlindDateRecord blindDateRecord = blindDateRecordRepository.findOne(example).orElse(null);
         BlindDateRecordVO blindDateRecordVO = new BlindDateRecordVO();
         if (blindDateRecord == null) {
-            return null;
+            return new BlindDateRecordVO();
         }
         BeanUtils.copyProperties(blindDateRecord, blindDateRecordVO);
 
@@ -145,7 +154,7 @@ public class MainServiceImpl implements MainService {
 
         // 判断下是否是该用户的候选人
         BlindDateRecord blindDateRecord = blindDateRecordRepository.findOne(example).orElse(null);
-        if(blindDateRecord == null) {
+        if(blindDateRecord == null || blindDateRecord.getId().intValue() != blindDateRecordVO.getId()) {
             throw new BaseException(ResponseEnum.CANDIDATE_DONT_EXISTS);
         }
 
@@ -171,7 +180,7 @@ public class MainServiceImpl implements MainService {
 
         Map<Integer, Candidate> candidateIdMapCandidate = candidateList.stream().collect(Collectors.toMap(Candidate::getUserId, Function.identity()));
 
-        List<BlindDateRecordDTO> dateRecordDTOList = new ArrayList<>();
+        List<BlindDateRecordDTO> dateRecordDTOList = Lists.newArrayList();
 
         blindDateRecordList.forEach(blindDateRecord -> {
             BlindDateRecordDTO blindDateRecordDTO = new BlindDateRecordDTO();
@@ -191,7 +200,7 @@ public class MainServiceImpl implements MainService {
             return Collections.emptyList();
         }
 
-        List<Pair<String, Integer>> candidateMapScoreList = new ArrayList<>();
+        List<Pair<String, Integer>> candidateMapScoreList = Lists.newArrayList();
         blindDateRecordDTO.forEach( dto -> {
             List<OneRecord> candidateRecord = dto.getCandidateRecord();
             List<OneRecord> userRecord = dto.getUserRecord();
