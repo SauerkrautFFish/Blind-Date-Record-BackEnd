@@ -142,6 +142,7 @@ public class MainServiceImpl implements MainService {
     @Override
     public void setCandidateBlindRecord(Integer userId, BlindDateRecordVO blindDateRecordVO) throws BaseException {
         if (blindDateRecordVO == null || blindDateRecordVO.getId() == null ||
+                blindDateRecordVO.getCandidateId() == null ||
                 blindDateRecordVO.getCandidateRecord() == null ||
                 blindDateRecordVO.getUserRecord() == null) {
             throw new BaseException(ResponseEnum.MISSING_PARAMS);

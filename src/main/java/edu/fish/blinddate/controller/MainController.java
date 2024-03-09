@@ -102,9 +102,10 @@ public class MainController {
     }
 
     @RequestMapping(path = "/setCandidateBlindRecord", method = RequestMethod.POST)
-    public BaseResponse<BlindDateRecordVO> setCandidateBlindRecord(BlindDateRecordVO blindDateRecordVO) {
+    public BaseResponse<BlindDateRecordVO> setCandidateBlindRecord(@RequestBody BlindDateRecordVO blindDateRecordVO) {
         Integer userId = UserContext.getUserId();
         try {
+            System.out.println(blindDateRecordVO);
             mainService.setCandidateBlindRecord(userId, blindDateRecordVO);
             return BaseResponse.success();
         } catch (BaseException e) {
