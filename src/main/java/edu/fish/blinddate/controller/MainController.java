@@ -8,7 +8,6 @@ import edu.fish.blinddate.utils.UserContext;
 import edu.fish.blinddate.vo.BlindDateRecordVO;
 import edu.fish.blinddate.vo.CandidateVO;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -55,10 +54,6 @@ public class MainController {
             return BaseResponse.error();
         }
 
-    }
-
-    private Integer getUserIdFromRequest(HttpServletRequest request) {
-        return Integer.valueOf(request.getParameter("userId"));
     }
 
     @RequestMapping(path = "/getCandidateList", method = RequestMethod.GET)
