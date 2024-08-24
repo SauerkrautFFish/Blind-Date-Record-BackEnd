@@ -304,7 +304,7 @@ public class MainServiceImpl implements MainService {
                 cnt = this.calculateTryCnt(userRecord);
                 successRate = this.calculateSuccessRate(candidateRecord);
             } else {
-                // 如果是谁在意你排行榜 主要看她邀请你的次数 + 赴约你的百分比
+                // 如果是谁在意你排行榜 主要看相亲对象邀请你的次数 + 赴约你的百分比
                  cnt = this.calculateTryCnt(candidateRecord);
                  successRate = this.calculateSuccessRate(userRecord);
             }
