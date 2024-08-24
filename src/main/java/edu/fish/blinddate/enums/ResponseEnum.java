@@ -21,6 +21,8 @@ public enum ResponseEnum {
 
     GPT_CALLED_ERROR(26, "GPT调用异常"),
     CANDIDATE_DONT_EXISTS(27, "候选人不存在"),
+
+    RECORD_DATE_DUPLICATION(28, "记录日期重复"),
     ;
 
     private final int code;

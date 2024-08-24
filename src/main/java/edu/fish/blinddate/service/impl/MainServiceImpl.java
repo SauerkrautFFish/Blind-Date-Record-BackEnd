@@ -2,6 +2,7 @@ package edu.fish.blinddate.service.impl;
 
 import com.alibaba.fastjson2.util.DateUtils;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import edu.fish.blinddate.dto.BlindDateRecordDTO;
 import edu.fish.blinddate.entity.BlindDateRecord;
 import edu.fish.blinddate.entity.Candidate;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -125,6 +127,7 @@ public class MainServiceImpl implements MainService {
             throw new BaseException(ResponseEnum.MISSING_PARAMS);
         }
 
+        // 获取候选人记录
         BlindDateRecord query = new BlindDateRecord();
         query.setUserId(userId);
         query.setCandidateId(candidateId);
@@ -134,8 +137,80 @@ public class MainServiceImpl implements MainService {
         if (blindDateRecord == null) {
             return new BlindDateRecordVO();
         }
+
+        // 获取候选人名字
+        Candidate candidateQuery = new Candidate();
+        candidateQuery.setId(candidateId);
+        Example<Candidate> candidateExample = Example.of(candidateQuery);
+        Candidate candidate = candidateRepository.findOne(candidateExample).orElse(null);
+        if (candidate == null) {
+            throw new BaseException(ResponseEnum.CANDIDATE_DONT_EXISTS);
+        }
+
         BeanUtils.copyProperties(blindDateRecord, blindDateRecordVO);
 
+        Set<String> userDateSet = Sets.newHashSet();
+        for (OneRecord one : blindDateRecord.getUserRecord()) {
+            userDateSet.add(one.getDate());
+        }
+        Set<String> candidateDateSet = Sets.newHashSet();
+        for (OneRecord one : blindDateRecord.getCandidateRecord()) {
+            candidateDateSet.add(one.getDate());
+        }
+
+        // x轴-日期
+        Set<String> dateSet = Sets.newHashSet(userDateSet);
+        dateSet.addAll(candidateDateSet);
+        List<String> dateList = Lists.newArrayList(dateSet);
+        Collections.sort(dateList);
+
+        // y轴-用户和候选人的记录
+        List<BigDecimal> userYAxisData = Lists.newArrayList();
+        BigDecimal successCnt = BigDecimal.ZERO;
+        BigDecimal totalCnt = BigDecimal.ZERO;
+        for (String date : dateList) {
+            if(userDateSet.contains(date)) {
+               for(OneRecord one : blindDateRecord.getUserRecord())  {
+                   if (one.getDate().equals(date)) {
+                       successCnt = successCnt.add(BigDecimal.valueOf(one.getSuccessCnt()));
+                       totalCnt = totalCnt.add(BigDecimal.valueOf(one.getTotalCnt()));
+                       break;
+                   }
+               }
+            }
+
+            if(totalCnt.compareTo(BigDecimal.ZERO) == 0) {
+                userYAxisData.add(BigDecimal.ZERO);
+            } else {
+                userYAxisData.add(successCnt.multiply(BigDecimal.valueOf(100)).divide(totalCnt, 2, RoundingMode.HALF_UP));
+            }
+        }
+
+        List<BigDecimal> candidateYAxisData = Lists.newArrayList();
+        successCnt = BigDecimal.ZERO;
+        totalCnt = BigDecimal.ZERO;
+        for (String date : dateList) {
+            if(candidateDateSet.contains(date)) {
+                for(OneRecord one : blindDateRecord.getCandidateRecord())  {
+                    if (one.getDate().equals(date)) {
+                        successCnt = successCnt.add(BigDecimal.valueOf(one.getSuccessCnt()));
+                        totalCnt = totalCnt.add(BigDecimal.valueOf(one.getTotalCnt()));
+                        break;
+                    }
+                }
+            }
+
+            if(totalCnt.compareTo(BigDecimal.ZERO) == 0) {
+                candidateYAxisData.add(BigDecimal.ZERO);
+            } else {
+                candidateYAxisData.add(successCnt.multiply(BigDecimal.valueOf(100)).divide(totalCnt, 2, RoundingMode.HALF_UP));
+            }
+        }
+
+        blindDateRecordVO.setCandidateName(candidate.getName());
+        blindDateRecordVO.setDateXAxisData(dateList);
+        blindDateRecordVO.setUserYAxisData(userYAxisData);
+        blindDateRecordVO.setCandidateYAxisData(candidateYAxisData);
         return blindDateRecordVO;
     }
 
@@ -146,6 +221,23 @@ public class MainServiceImpl implements MainService {
                 blindDateRecordVO.getCandidateRecord() == null ||
                 blindDateRecordVO.getUserRecord() == null) {
             throw new BaseException(ResponseEnum.MISSING_PARAMS);
+        }
+
+        // 不能有相同的日期
+        Set<String> dateSet = Sets.newHashSet();
+        for (OneRecord one : blindDateRecordVO.getCandidateRecord()) {
+            if (dateSet.contains(one.getDate())) {
+                throw new BaseException(ResponseEnum.RECORD_DATE_DUPLICATION);
+            }
+            dateSet.add(one.getDate());
+        }
+
+        dateSet.clear();
+        for (OneRecord one : blindDateRecordVO.getUserRecord()) {
+            if (dateSet.contains(one.getDate())) {
+                throw new BaseException(ResponseEnum.RECORD_DATE_DUPLICATION);
+            }
+            dateSet.add(one.getDate());
         }
 
         BlindDateRecord query = new BlindDateRecord();

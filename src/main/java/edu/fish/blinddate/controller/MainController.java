@@ -36,8 +36,8 @@ public class MainController {
         } catch (BaseException e) {
             return BaseResponse.set(e.getCodeAndMsg());
         } catch (Exception e) {
-            logger.error("system error, input params: newAccount={}, newPassword={}, userName={}. error msg: {}", newAccount, newPassword, userName, e.getMessage());
-            return BaseResponse.error();
+            logger.error("system internalError, input params: newAccount={}, newPassword={}, userName={}. internalError msg: {}", newAccount, newPassword, userName, e.getMessage());
+            return BaseResponse.internalError();
         }
     }
 
@@ -50,8 +50,8 @@ public class MainController {
         } catch (BaseException e) {
             return BaseResponse.set(e.getCodeAndMsg());
         } catch (Exception e) {
-            logger.error("system error, input params: account={}, password={}. error msg: {}", account, password, e.getMessage());
-            return BaseResponse.error();
+            logger.error("system internalError, input params: account={}, password={}. internalError msg: {}", account, password, e.getMessage());
+            return BaseResponse.internalError();
         }
 
     }
@@ -63,8 +63,8 @@ public class MainController {
             List<CandidateVO> candidateVOList = mainService.getCandidateListByUserId(userId);
             return BaseResponse.successData(candidateVOList);
         } catch (Exception e) {
-            logger.error("system error, input params: userId={}. error msg: {}", userId, e.getMessage());
-            return BaseResponse.error();
+            logger.error("system internalError, input params: userId={}. internalError msg: {}", userId, e.getMessage());
+            return BaseResponse.internalError();
         }
     }
 
@@ -77,8 +77,8 @@ public class MainController {
         } catch (BaseException e) {
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
-            logger.error("system error, input params: userId={}, candidateName={}. error msg: {}", userId, candidateName, e.getMessage());
-            return BaseResponse.error();
+            logger.error("system internalError, input params: userId={}, candidateName={}. internalError msg: {}", userId, candidateName, e.getMessage());
+            return BaseResponse.internalError();
         }
     }
 
@@ -91,8 +91,8 @@ public class MainController {
         } catch (BaseException e) {
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
-            logger.error("system error, input params: userId={}, candidateId={}. error msg: {}", userId, candidateId, e.getMessage());
-            return BaseResponse.error();
+            logger.error("system internalError, input params: userId={}, candidateId={}. internalError msg: {}", userId, candidateId, e.getMessage());
+            return BaseResponse.internalError();
         }
     }
 
@@ -100,42 +100,41 @@ public class MainController {
     public BaseResponse<BlindDateRecordVO> setCandidateBlindRecord(@RequestBody BlindDateRecordVO blindDateRecordVO) {
         Integer userId = UserContext.getUserId();
         try {
-            System.out.println(blindDateRecordVO);
             mainService.setCandidateBlindRecord(userId, blindDateRecordVO);
             return BaseResponse.success();
         } catch (BaseException e) {
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
-            logger.error("system error, input params: userId={}, blindDateRecordVO={}. error msg: {}", userId, blindDateRecordVO, e.getMessage());
-            return BaseResponse.error();
+            logger.error("system internalError, input params: userId={}, blindDateRecordVO={}. internalError msg: {}", userId, blindDateRecordVO, e.getMessage());
+            return BaseResponse.internalError();
         }
     }
 
-    @RequestMapping(path = "/getFocusOnYouRank", method = RequestMethod.GET)
-    public BaseResponse<List<String>> getFocusOnYouRank(@RequestParam(name = "rankingListLength", defaultValue = "5") Integer rankingListLength) {
+//    @RequestMapping(path = "/getFocusOnYouRank", method = RequestMethod.GET)
+//    public BaseResponse<List<String>> getFocusOnYouRank(@RequestParam(name = "rankingListLength", defaultValue = "5") Integer rankingListLength) {
+//        Integer userId = UserContext.getUserId();
+//        try {
+//            List<String> nameList = mainService.getFocusOnRank(userId, false, rankingListLength);
+//            return BaseResponse.successData(nameList);
+//        } catch (BaseException e) {
+//            return BaseResponse.set(e.getCodeAndMsg());
+//        }  catch (Exception e) {
+//            logger.internalError("system internalError, input params: userId={}, rankingListLength={}. internalError msg: {}", userId, rankingListLength, e.getMessage());
+//            return BaseResponse.internalError();
+//        }
+//    }
+
+    @RequestMapping(path = "/getFocusOnRank", method = RequestMethod.GET)
+    public BaseResponse<List<String>> getFocusOnRank(@RequestParam(name = "rankingListLength", defaultValue = "5") Integer rankingListLength, boolean youFlag) {
         Integer userId = UserContext.getUserId();
         try {
-            List<String> nameList = mainService.getFocusOnRank(userId, false, rankingListLength);
+            List<String> nameList = mainService.getFocusOnRank(userId, youFlag, rankingListLength);
             return BaseResponse.successData(nameList);
         } catch (BaseException e) {
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
-            logger.error("system error, input params: userId={}, rankingListLength={}. error msg: {}", userId, rankingListLength, e.getMessage());
-            return BaseResponse.error();
-        }
-    }
-
-    @RequestMapping(path = "/getYouFocusOnRank", method = RequestMethod.GET)
-    public BaseResponse<List<String>> getYouFocusOnRank(@RequestParam(name = "rankingListLength", defaultValue = "5") Integer rankingListLength) {
-        Integer userId = UserContext.getUserId();
-        try {
-            List<String> nameList = mainService.getFocusOnRank(userId, true, rankingListLength);
-            return BaseResponse.successData(nameList);
-        } catch (BaseException e) {
-            return BaseResponse.set(e.getCodeAndMsg());
-        }  catch (Exception e) {
-            logger.error("system error, input params: userId={}, rankingListLength={}. error msg: {}", userId, rankingListLength, e.getMessage());
-            return BaseResponse.error();
+            logger.error("system internalError, input params: userId={}, rankingListLength={}. internalError msg: {}", userId, rankingListLength, e.getMessage());
+            return BaseResponse.internalError();
         }
     }
 
@@ -148,8 +147,8 @@ public class MainController {
         } catch (BaseException e) {
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
-            logger.error("system error, input params: userId={}, candidateId={}. error msg: {}", userId, candidateId, e.getMessage());
-            return BaseResponse.error();
+            logger.error("system internalError, input params: userId={}, candidateId={}. internalError msg: {}", userId, candidateId, e.getMessage());
+            return BaseResponse.internalError();
         }
     }
 }

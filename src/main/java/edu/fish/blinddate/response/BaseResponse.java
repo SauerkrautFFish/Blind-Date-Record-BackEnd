@@ -55,12 +55,8 @@ public class BaseResponse<T> implements Serializable {
         return new BaseResponse<T>(ResponseEnum.SUCCESS.getCode(), message, data);
     }
 
-    public static <T> BaseResponse<T> error() {
-        return new BaseResponse<T>(ResponseEnum.SYSTEM_ERROR.getCode());
-    }
-
-    public static <T> BaseResponse<T> errMsg(String errMsg) {
-        return new BaseResponse<T>(ResponseEnum.SYSTEM_ERROR.getCode(), errMsg);
+    public static <T> BaseResponse<T> internalError() {
+        return new BaseResponse<T>(ResponseEnum.SYSTEM_ERROR, null);
     }
 
     public static <T> BaseResponse<T> set(ResponseEnum responseEnum) {
