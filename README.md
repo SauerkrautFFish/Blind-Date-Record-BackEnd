@@ -25,7 +25,7 @@ docker push knighthong/bd-platform:latest
 
 docker pull dockerproxy.cn/knighthong/bd-platform:latest
 
-docker run -d -p 8080:8080 --network my_network image
+docker run -d -p 8080:8080 --name bd_platform --network my_network image
 
 mysql
 
