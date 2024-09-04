@@ -133,7 +133,7 @@ public class MainController {
         } catch (BaseException e) {
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
-            logger.error("system internalError, input params: userId={}, rankingListLength={}. internalError msg: {}", userId, rankingListLength, e.getMessage());
+            logger.error("system internalError, input params: userId={}, rankingListLength={}, youFlag={}, internalError msg: {}", userId, rankingListLength, youFlag, e.getMessage());
             return BaseResponse.internalError();
         }
     }

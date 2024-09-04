@@ -271,7 +271,7 @@ public class MainServiceImpl implements MainService {
         List<Integer> candidateIdList = blindDateRecordList.stream().map(BlindDateRecord::getCandidateId).toList();
         List<Candidate> candidateList = candidateRepository.findAllById(candidateIdList);
 
-        Map<Integer, Candidate> candidateIdMapCandidate = candidateList.stream().collect(Collectors.toMap(Candidate::getUserId, Function.identity()));
+        Map<Integer, Candidate> candidateIdMapCandidate = candidateList.stream().collect(Collectors.toMap(Candidate::getId, Function.identity()));
 
         List<BlindDateRecordDTO> dateRecordDTOList = Lists.newArrayList();
 
@@ -320,7 +320,9 @@ public class MainServiceImpl implements MainService {
             }
         });
 
-        return candidateMapScoreList.stream().map(Pair::getFirst).toList().subList(0, rankingListLength);
+        int minn = Math.min(rankingListLength, candidateMapScoreList.size());
+
+        return candidateMapScoreList.stream().map(Pair::getFirst).toList().subList(0, minn);
     }
 
     private int calculateScore(int cnt, BigDecimal successRate) {
