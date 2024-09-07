@@ -4,27 +4,25 @@ import com.alibaba.fastjson2.util.DateUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import edu.fish.blinddate.dto.BlindDateRecordDTO;
-import edu.fish.blinddate.entity.BlindDateRecord;
-import edu.fish.blinddate.entity.Candidate;
-import edu.fish.blinddate.entity.OneRecord;
-import edu.fish.blinddate.entity.User;
+import edu.fish.blinddate.entity.*;
+import edu.fish.blinddate.entity.convert.OneRecordConverter;
+import edu.fish.blinddate.entity.task.GenerateReportTask;
 import edu.fish.blinddate.enums.ResponseEnum;
-import edu.fish.blinddate.enums.Role;
 import edu.fish.blinddate.exception.BaseException;
-import edu.fish.blinddate.gpt.GeminiProModel;
 import edu.fish.blinddate.repository.BlindDateRecordRepository;
+import edu.fish.blinddate.repository.CandidateReportRepository;
 import edu.fish.blinddate.repository.CandidateRepository;
 import edu.fish.blinddate.repository.UserRepository;
 import edu.fish.blinddate.service.MainService;
-import edu.fish.blinddate.utils.TemplateUtil;
 import edu.fish.blinddate.vo.BlindDateRecordVO;
+import edu.fish.blinddate.vo.CandidateReportVO;
 import edu.fish.blinddate.vo.CandidateVO;
 import jakarta.annotation.Resource;
-import org.apache.hc.core5.http.HttpHost;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Example;
 import org.springframework.data.util.Pair;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -43,6 +41,12 @@ public class MainServiceImpl implements MainService {
     CandidateRepository candidateRepository;
     @Resource
     BlindDateRecordRepository blindDateRecordRepository;
+
+    @Resource
+    CandidateReportRepository candidateReportRepository;
+
+    @Resource
+    ThreadPoolTaskExecutor candidateReportThreadPool;
 
     @Override
     public void registerUser(String newAccount, String newPassword, String userName) throws BaseException {
@@ -301,12 +305,12 @@ public class MainServiceImpl implements MainService {
             BigDecimal successRate = null;
             if (you) {
                 // 如果是你在意谁排行榜 主要看你邀请的次数 + 你赴约的百分比
-                cnt = this.calculateTryCnt(userRecord);
-                successRate = this.calculateSuccessRate(candidateRecord);
+                cnt = OneRecordConverter.calculateTryCnt(userRecord);
+                successRate = OneRecordConverter.calculateSuccessRate(candidateRecord);
             } else {
                 // 如果是谁在意你排行榜 主要看相亲对象邀请你的次数 + 赴约你的百分比
-                 cnt = this.calculateTryCnt(candidateRecord);
-                 successRate = this.calculateSuccessRate(userRecord);
+                 cnt = OneRecordConverter.calculateTryCnt(candidateRecord);
+                 successRate = OneRecordConverter.calculateSuccessRate(userRecord);
             }
 
             int score = this.calculateScore(cnt, successRate);
@@ -330,55 +334,55 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public String getCandidateAnalysisReport(Integer userId, Integer candidateId) throws BaseException {
+    public void generateAnalysisCandidateReport(Integer userId, Integer candidateId) throws BaseException {
         if (candidateId == null) {
             throw new BaseException(ResponseEnum.MISSING_PARAMS);
         }
 
-        BlindDateRecordVO candidateBlindRecord = this.getCandidateBlindRecord(userId, candidateId);
+        // 报告表
+        CandidateReport query = new CandidateReport();
+        query.setCandidateId(candidateId);
+        Example<CandidateReport> example = Example.of(query);
+        CandidateReport candidateReport = candidateReportRepository.findOne(example).orElse(null);
 
-        List<OneRecord> candidateRecordList = candidateBlindRecord.getCandidateRecord();
-        List<OneRecord> userRecordList = candidateBlindRecord.getUserRecord();
+        if (candidateReport != null && candidateReport.getStatus() == 1) {
+            throw new BaseException(ResponseEnum.GENERATING_REPORT);
+        }
 
-        // 尝试约会次数
-        int candidateCnt = this.calculateTryCnt(candidateRecordList);
-        int userCnt = this.calculateTryCnt(userRecordList);
-        // 约会成功率
-        BigDecimal candidateSuccessRate = this.calculateSuccessRate(candidateRecordList);
-        BigDecimal userSuccessRate = this.calculateSuccessRate(userRecordList);
+        if (candidateReport == null) {
+            candidateReport = new CandidateReport();
+            candidateReport.setTimes(0);
+        }
 
-        StringBuilder candidateStr = new StringBuilder();
-        candidateRecordList.forEach(oneRecord -> {
-            candidateStr.append(TemplateUtil.singleCandidateAnalysisTemplatePart1(candidateStr, oneRecord, Role.CANDIDATE));
-        });
-
-        StringBuilder userStr = new StringBuilder();
-        userRecordList.forEach(oneRecord -> {
-            userStr.append(TemplateUtil.singleCandidateAnalysisTemplatePart1(userStr, oneRecord, Role.USER));
-        });
-
-        TemplateUtil.singleCandidateAnalysisTemplatePart2(candidateStr, candidateCnt, candidateSuccessRate, Role.CANDIDATE);
-        TemplateUtil.singleCandidateAnalysisTemplatePart2(candidateStr, userCnt, userSuccessRate, Role.USER);
-
-        String promptAndMSg = TemplateUtil.singleCandidateAnalysisTemplatePart3(userStr, candidateStr);
-
-        // send
-        GeminiProModel geminiPro = GeminiProModel.builder().init().proxy(new HttpHost("localhost", 7890));
-        String responseText = geminiPro.generateTextOnce(promptAndMSg);
-
-        return responseText;
+        // insert or update
+        candidateReport.setCandidateId(candidateId);
+        candidateReport.setReport(null);
+        candidateReport.setStatus(1);
+        candidateReportRepository.save(candidateReport);
+        // 加入到线程池
+        candidateReportThreadPool.submit(new GenerateReportTask(this, candidateReportRepository,
+                userId, candidateId));
     }
 
-    private BigDecimal calculateSuccessRate(List<OneRecord> record) {
-        int successCnt = record.stream().mapToInt(OneRecord::getSuccessCnt).sum();
-        int totalCnt = record.stream().mapToInt(OneRecord::getTotalCnt).sum();
+    @Override
+    public CandidateReportVO getAnalysisCandidateReport(Integer userId, Integer candidateId) throws BaseException {
+        if (candidateId == null) {
+            throw new BaseException(ResponseEnum.MISSING_PARAMS);
+        }
 
-        return  totalCnt > 0 ? BigDecimal.valueOf(successCnt)
-                .divide(BigDecimal.valueOf(totalCnt), 4, BigDecimal.ROUND_HALF_UP)
-                : BigDecimal.ZERO;
-    }
+        // 报告表
+        CandidateReport query = new CandidateReport();
+        query.setCandidateId(candidateId);
+        Example<CandidateReport> example = Example.of(query);
+        CandidateReport candidateReport = candidateReportRepository.findOne(example).orElse(null);
 
-    private int calculateTryCnt(List<OneRecord> record) {
-        return record.stream().mapToInt(OneRecord::getTotalCnt).sum();
+        if (candidateReport == null) {
+            throw new BaseException(ResponseEnum.REPORT_NOT_EXISTS);
+        }
+
+        CandidateReportVO candidateReportVO = new CandidateReportVO();
+        BeanUtils.copyProperties(candidateReport, candidateReportVO);
+
+        return candidateReportVO;
     }
 }

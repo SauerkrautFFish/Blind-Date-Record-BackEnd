@@ -6,6 +6,7 @@ import edu.fish.blinddate.service.MainService;
 import edu.fish.blinddate.utils.JWTUtil;
 import edu.fish.blinddate.utils.UserContext;
 import edu.fish.blinddate.vo.BlindDateRecordVO;
+import edu.fish.blinddate.vo.CandidateReportVO;
 import edu.fish.blinddate.vo.CandidateVO;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
@@ -139,15 +140,29 @@ public class MainController {
     }
 
     @RequestMapping(path = "/analyzeCandidate", method = RequestMethod.GET)
-    public BaseResponse<String> getAnalyzeCandidateReport(Integer candidateId) {
+    public BaseResponse<Object> generateAnalysisCandidateReport(Integer candidateId) {
         Integer userId = UserContext.getUserId();
         try {
-            String textReport = mainService.getCandidateAnalysisReport(userId, candidateId);
-            return BaseResponse.successData(textReport);
+            mainService.generateAnalysisCandidateReport(userId, candidateId);
+            return BaseResponse.success();
         } catch (BaseException e) {
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
             logger.error("system internalError, input params: userId={}, candidateId={}. internalError msg: {}", userId, candidateId, e.getMessage());
+            return BaseResponse.internalError();
+        }
+    }
+
+    @RequestMapping(path = "/analyzeCandidate", method = RequestMethod.GET)
+    public BaseResponse<CandidateReportVO> getCandidateReport(Integer candidateId) {
+        Integer userId = UserContext.getUserId();
+        try {
+            CandidateReportVO candidateReportVO = mainService.getAnalysisCandidateReport(userId, candidateId);
+            return BaseResponse.successData(candidateReportVO);
+        } catch (BaseException e) {
+            return BaseResponse.set(e.getCodeAndMsg());
+        }  catch (Exception e) {
+            logger.error("system internalError, getCandidateReport input params: userId={}, candidateId={}. internalError msg: {}", userId, candidateId, e.getMessage());
             return BaseResponse.internalError();
         }
     }

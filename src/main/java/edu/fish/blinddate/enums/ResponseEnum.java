@@ -23,6 +23,10 @@ public enum ResponseEnum {
     CANDIDATE_DONT_EXISTS(27, "候选人不存在"),
 
     RECORD_DATE_DUPLICATION(28, "记录日期重复"),
+
+    GENERATING_REPORT(29, "报告正在生成中"),
+
+    REPORT_NOT_EXISTS(30, "报告不存在"),
     ;
 
     private final int code;

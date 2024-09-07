@@ -2,6 +2,7 @@ package edu.fish.blinddate.service;
 
 import edu.fish.blinddate.exception.BaseException;
 import edu.fish.blinddate.vo.BlindDateRecordVO;
+import edu.fish.blinddate.vo.CandidateReportVO;
 import edu.fish.blinddate.vo.CandidateVO;
 
 import java.util.List;
@@ -21,5 +22,7 @@ public interface MainService {
 
     List<String> getFocusOnRank(Integer userId, boolean you, int rankingListLength) throws BaseException;
 
-    String getCandidateAnalysisReport(Integer userId, Integer candidateId) throws BaseException;
+    void generateAnalysisCandidateReport(Integer userId, Integer candidateId) throws BaseException;
+
+    CandidateReportVO getAnalysisCandidateReport(Integer userId, Integer candidateId) throws BaseException;
 }
