@@ -153,7 +153,7 @@ public class MainController {
         }
     }
 
-    @RequestMapping(path = "/analyzeCandidate", method = RequestMethod.GET)
+    @RequestMapping(path = "/getCandidateReport", method = RequestMethod.GET)
     public BaseResponse<CandidateReportVO> getCandidateReport(Integer candidateId) {
         Integer userId = UserContext.getUserId();
         try {

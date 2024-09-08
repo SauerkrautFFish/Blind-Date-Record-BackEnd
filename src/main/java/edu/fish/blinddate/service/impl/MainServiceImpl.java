@@ -28,6 +28,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -382,6 +383,16 @@ public class MainServiceImpl implements MainService {
 
         CandidateReportVO candidateReportVO = new CandidateReportVO();
         BeanUtils.copyProperties(candidateReport, candidateReportVO);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        candidateReportVO.setUpdateTime(simpleDateFormat.format(candidateReport.getUpdateTime()));
+
+        Candidate queryCandidate = new Candidate();
+        queryCandidate.setId(candidateId);
+        Example<Candidate> candidateExample = Example.of(queryCandidate);
+        Candidate candidate = candidateRepository.findOne(candidateExample).orElse(null);
+        if(candidate != null) {
+            candidateReportVO.setCandidateName(candidate.getName());
+        }
 
         return candidateReportVO;
     }
