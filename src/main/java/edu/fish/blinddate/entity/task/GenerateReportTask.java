@@ -5,6 +5,7 @@ import edu.fish.blinddate.entity.OneRecord;
 import edu.fish.blinddate.entity.convert.OneRecordConverter;
 import edu.fish.blinddate.enums.Role;
 import edu.fish.blinddate.exception.BaseException;
+import edu.fish.blinddate.gpt.HunYuanModel;
 import edu.fish.blinddate.repository.CandidateReportRepository;
 import edu.fish.blinddate.service.MainService;
 import edu.fish.blinddate.utils.TemplateUtil;
@@ -23,11 +24,15 @@ public class GenerateReportTask implements Runnable {
 
     private CandidateReportRepository candidateReportRepository;
 
-    public GenerateReportTask(MainService mainService, CandidateReportRepository candidateReportRepository, int userId, int candidateId) {
+    private HunYuanModel hunYuanModel;
+
+    public GenerateReportTask(MainService mainService, CandidateReportRepository candidateReportRepository,
+                              int userId, int candidateId, HunYuanModel hunYuanModel) {
         this.mainService = mainService;
         this.candidateReportRepository = candidateReportRepository;
         this.userId = userId;
         this.candidateId = candidateId;
+        this.hunYuanModel = hunYuanModel;
     }
 
     @Override
@@ -67,8 +72,8 @@ public class GenerateReportTask implements Runnable {
         // send
         // GeminiProModel geminiPro = GeminiProModel.builder().init().proxy(new HttpHost("localhost", 7890));
         // String responseText = geminiPro.generateTextOnce(promptAndMSg);
-        String responseText = "test text";
-        System.out.println(responseText);
+
+        String responseText = hunYuanModel.generateTextOnce(promptAndMSg);
 
         // 报告表
         CandidateReport query = new CandidateReport();

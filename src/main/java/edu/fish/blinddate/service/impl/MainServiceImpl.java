@@ -9,6 +9,7 @@ import edu.fish.blinddate.entity.convert.OneRecordConverter;
 import edu.fish.blinddate.entity.task.GenerateReportTask;
 import edu.fish.blinddate.enums.ResponseEnum;
 import edu.fish.blinddate.exception.BaseException;
+import edu.fish.blinddate.gpt.HunYuanModel;
 import edu.fish.blinddate.repository.BlindDateRecordRepository;
 import edu.fish.blinddate.repository.CandidateReportRepository;
 import edu.fish.blinddate.repository.CandidateRepository;
@@ -48,6 +49,9 @@ public class MainServiceImpl implements MainService {
 
     @Resource
     ThreadPoolTaskExecutor candidateReportThreadPool;
+
+    @Resource
+    HunYuanModel hunYuanModel;
 
     @Override
     public void registerUser(String newAccount, String newPassword, String userName) throws BaseException {
@@ -362,7 +366,7 @@ public class MainServiceImpl implements MainService {
         candidateReportRepository.save(candidateReport);
         // 加入到线程池
         candidateReportThreadPool.submit(new GenerateReportTask(this, candidateReportRepository,
-                userId, candidateId));
+                userId, candidateId, hunYuanModel));
     }
 
     @Override

@@ -37,7 +37,7 @@ public class TemplateUtil {
     }
 
     public static String singleCandidateAnalysisTemplatePart3(StringBuilder text1, StringBuilder text2) {
-        return getSingleCandidateAnalysisPrompt() + text1.toString() + text2.toString();
+        return text1.toString() + text2.toString();
     }
 
     private static String getSingleCandidateAnalysisPrompt() {
