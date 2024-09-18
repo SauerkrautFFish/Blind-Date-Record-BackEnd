@@ -48,24 +48,29 @@ public class GenerateReportTask implements Runnable {
         List<OneRecord> userRecordList = candidateBlindRecord.getUserRecord();
 
         // 尝试约会次数
-        int candidateCnt = OneRecordConverter.calculateTryCnt(candidateRecordList);
-        int userCnt = OneRecordConverter.calculateTryCnt(userRecordList);
+        int candidateCnt = 0, userCnt = 0;
         // 约会成功率
-        BigDecimal candidateSuccessRate = OneRecordConverter.calculateSuccessRate(candidateRecordList);
-        BigDecimal userSuccessRate = OneRecordConverter.calculateSuccessRate(userRecordList);
+        BigDecimal candidateSuccessRate = BigDecimal.ZERO, userSuccessRate = BigDecimal.ZERO;
+        // text
+        StringBuilder candidateStr = new StringBuilder(), userStr = new StringBuilder();
+        if (candidateRecordList != null && candidateRecordList.size() != 0) {
+            candidateCnt = OneRecordConverter.calculateTryCnt(candidateRecordList);
+            candidateSuccessRate = OneRecordConverter.calculateSuccessRate(candidateRecordList);
+            candidateRecordList.forEach(oneRecord -> {
+                candidateStr.append(TemplateUtil.singleCandidateAnalysisTemplatePart1(candidateStr, oneRecord, Role.CANDIDATE));
+            });
+        }
 
-        StringBuilder candidateStr = new StringBuilder();
-        candidateRecordList.forEach(oneRecord -> {
-            candidateStr.append(TemplateUtil.singleCandidateAnalysisTemplatePart1(candidateStr, oneRecord, Role.CANDIDATE));
-        });
-
-        StringBuilder userStr = new StringBuilder();
-        userRecordList.forEach(oneRecord -> {
-            userStr.append(TemplateUtil.singleCandidateAnalysisTemplatePart1(userStr, oneRecord, Role.USER));
-        });
+        if (userRecordList != null && userRecordList.size() != 0) {
+            userCnt = OneRecordConverter.calculateTryCnt(userRecordList);
+            userSuccessRate = OneRecordConverter.calculateSuccessRate(userRecordList);
+            userRecordList.forEach(oneRecord -> {
+                userStr.append(TemplateUtil.singleCandidateAnalysisTemplatePart1(userStr, oneRecord, Role.USER));
+            });
+        }
 
         TemplateUtil.singleCandidateAnalysisTemplatePart2(candidateStr, candidateCnt, candidateSuccessRate, Role.CANDIDATE);
-        TemplateUtil.singleCandidateAnalysisTemplatePart2(candidateStr, userCnt, userSuccessRate, Role.USER);
+        TemplateUtil.singleCandidateAnalysisTemplatePart2(userStr, userCnt, userSuccessRate, Role.USER);
 
         String promptAndMSg = TemplateUtil.singleCandidateAnalysisTemplatePart3(userStr, candidateStr);
 
