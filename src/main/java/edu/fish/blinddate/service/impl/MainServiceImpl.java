@@ -111,7 +111,7 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public void addCandidateWithUserId(final Integer userId, String candidateName) throws BaseException {
+    public void addCandidate(final Integer userId, String candidateName) throws BaseException {
         if (candidateName == null) {
             throw new BaseException(ResponseEnum.MISSING_PARAMS);
         }
@@ -131,6 +131,47 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
+    public void modifyCandidate(Integer userId, Integer candidateId, String candidateName) throws BaseException {
+        if (candidateId == null) {
+            throw new BaseException(ResponseEnum.MISSING_PARAMS);
+        }
+
+        // 获取候选人记录
+        Candidate query = new Candidate();
+        query.setUserId(userId);
+        query.setId(candidateId);
+        Example<Candidate> example = Example.of(query);
+        Candidate candidate = candidateRepository.findOne(example).orElse(null);
+
+        if (candidate == null) {
+            throw new BaseException(ResponseEnum.CANDIDATE_DONT_EXISTS);
+        }
+
+        query.setName(candidateName);
+        candidateRepository.save(query);
+    }
+
+    @Override
+    public void removeCandidate(Integer userId, Integer candidateId) throws BaseException {
+        if (candidateId == null) {
+            throw new BaseException(ResponseEnum.MISSING_PARAMS);
+        }
+
+        // 获取候选人记录
+        Candidate query = new Candidate();
+        query.setUserId(userId);
+        query.setId(candidateId);
+        Example<Candidate> example = Example.of(query);
+        Candidate candidate = candidateRepository.findOne(example).orElse(null);
+
+        if (candidate == null) {
+            throw new BaseException(ResponseEnum.CANDIDATE_DONT_EXISTS);
+        }
+
+        candidateRepository.delete(query);
+    }
+
+    @Override
     public BlindDateRecordVO getCandidateBlindRecord(final Integer userId, final Integer candidateId) throws BaseException {
         if (candidateId == null) {
             throw new BaseException(ResponseEnum.MISSING_PARAMS);
@@ -142,7 +183,6 @@ public class MainServiceImpl implements MainService {
         query.setCandidateId(candidateId);
         Example<BlindDateRecord> example = Example.of(query);
         BlindDateRecord blindDateRecord = blindDateRecordRepository.findOne(example).orElse(null);
-        BlindDateRecordVO blindDateRecordVO = new BlindDateRecordVO();
         if (blindDateRecord == null) {
             return new BlindDateRecordVO();
         }
@@ -156,6 +196,7 @@ public class MainServiceImpl implements MainService {
             throw new BaseException(ResponseEnum.CANDIDATE_DONT_EXISTS);
         }
 
+        BlindDateRecordVO blindDateRecordVO = new BlindDateRecordVO();
         BeanUtils.copyProperties(blindDateRecord, blindDateRecordVO);
 
         Set<String> userDateSet = Sets.newHashSet();

@@ -14,7 +14,11 @@ public interface MainService {
 
     List<CandidateVO> getCandidateListByUserId(Integer userId);
 
-    void addCandidateWithUserId(Integer userId, String candidateName) throws BaseException;
+    void addCandidate(Integer userId, String candidateName) throws BaseException;
+
+    void modifyCandidate(Integer userId, Integer candidateId, String candidateName) throws BaseException;
+
+    void removeCandidate(Integer userId, Integer candidateId) throws BaseException;
 
     BlindDateRecordVO getCandidateBlindRecord(Integer userId, Integer candidateId) throws BaseException;
 
