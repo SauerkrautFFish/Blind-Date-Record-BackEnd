@@ -159,7 +159,7 @@ public class MainServiceImpl implements MainService {
 
         // 获取候选人记录
         Candidate query = new Candidate();
-        query.setUserId(userId);
+        // query.setUserId(userId);
         query.setId(candidateId);
         Example<Candidate> example = Example.of(query);
         Candidate candidate = candidateRepository.findOne(example).orElse(null);
@@ -169,6 +169,7 @@ public class MainServiceImpl implements MainService {
         }
 
         candidateRepository.delete(query);
+        blindDateRecordRepository.deleteByUserIdAndCandidateId(userId, candidateId);
     }
 
     @Override

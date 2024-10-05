@@ -180,4 +180,9 @@ public class MainController {
             return BaseResponse.internalError();
         }
     }
+
+    @RequestMapping(path = "/test", method = RequestMethod.GET)
+    public void a(Integer candidateId, Integer userId) {
+
+    }
 }
