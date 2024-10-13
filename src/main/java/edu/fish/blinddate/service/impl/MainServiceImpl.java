@@ -138,7 +138,7 @@ public class MainServiceImpl implements MainService {
 
         // 获取候选人记录
         Candidate query = new Candidate();
-        // query.setUserId(userId);
+        query.setUserId(userId);
         query.setId(candidateId);
         Example<Candidate> example = Example.of(query);
         Candidate candidate = candidateRepository.findOne(example).orElse(null);
@@ -147,8 +147,8 @@ public class MainServiceImpl implements MainService {
             throw new BaseException(ResponseEnum.CANDIDATE_DONT_EXISTS);
         }
 
-        query.setName(candidateName);
-        candidateRepository.save(query);
+        candidate.setName(candidateName);
+        candidateRepository.save(candidate);
     }
 
     @Override
@@ -392,7 +392,7 @@ public class MainServiceImpl implements MainService {
         Example<CandidateReport> example = Example.of(query);
         CandidateReport candidateReport = candidateReportRepository.findOne(example).orElse(null);
 
-        if (candidateReport != null && candidateReport.getStatus() == 1) {
+        if (candidateReport != null && candidateReport.getStatus() == 2) {
             throw new BaseException(ResponseEnum.GENERATING_REPORT);
         }
 
@@ -404,7 +404,7 @@ public class MainServiceImpl implements MainService {
         // insert or update
         candidateReport.setCandidateId(candidateId);
         candidateReport.setReport(null);
-        candidateReport.setStatus(1);
+        candidateReport.setStatus(2);
         candidateReportRepository.save(candidateReport);
         // 加入到线程池
         candidateReportThreadPool.submit(new GenerateReportTask(this, candidateReportRepository,

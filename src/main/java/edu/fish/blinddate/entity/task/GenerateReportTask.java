@@ -92,7 +92,7 @@ public class GenerateReportTask implements Runnable {
 
         candidateReport.setTimes(candidateReport.getTimes() + 1);
         candidateReport.setReport(responseText);
-        candidateReport.setStatus(2);
+        candidateReport.setStatus(3);
         candidateReportRepository.save(candidateReport);
 
     }
