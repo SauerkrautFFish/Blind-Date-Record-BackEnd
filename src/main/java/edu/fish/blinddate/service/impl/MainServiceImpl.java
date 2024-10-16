@@ -416,6 +416,8 @@ public class MainServiceImpl implements MainService {
         if (candidateId == null) {
             throw new BaseException(ResponseEnum.MISSING_PARAMS);
         }
+        // 返回vo
+        CandidateReportVO candidateReportVO = new CandidateReportVO();
 
         // 报告表
         CandidateReport query = new CandidateReport();
@@ -424,13 +426,17 @@ public class MainServiceImpl implements MainService {
         CandidateReport candidateReport = candidateReportRepository.findOne(example).orElse(null);
 
         if (candidateReport == null) {
-            throw new BaseException(ResponseEnum.REPORT_NOT_EXISTS);
+            // throw new BaseException(ResponseEnum.REPORT_NOT_EXISTS);
+            candidateReport = new CandidateReport();
+            candidateReport.setStatus(1);
         }
 
-        CandidateReportVO candidateReportVO = new CandidateReportVO();
         BeanUtils.copyProperties(candidateReport, candidateReportVO);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        candidateReportVO.setUpdateTime(simpleDateFormat.format(candidateReport.getUpdateTime()));
+
+        if (candidateReport.getUpdateTime() != null) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            candidateReportVO.setUpdateTime(simpleDateFormat.format(candidateReport.getUpdateTime()));
+        }
 
         Candidate queryCandidate = new Candidate();
         queryCandidate.setId(candidateId);
