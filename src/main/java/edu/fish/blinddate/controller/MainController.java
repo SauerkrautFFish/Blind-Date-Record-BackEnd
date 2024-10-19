@@ -84,15 +84,15 @@ public class MainController {
     }
 
     @RequestMapping(path = "/modifyCandidate", method = RequestMethod.POST)
-    public BaseResponse<Object> modifyCandidate(Integer candidateId, String candidateName) {
+    public BaseResponse<Object> modifyCandidate(Integer candidateId, String candidateName, Integer status) {
         Integer userId = UserContext.getUserId();
         try {
-            mainService.modifyCandidate(userId, candidateId, candidateName);
+            mainService.modifyCandidate(userId, candidateId, candidateName, status);
             return BaseResponse.success();
         } catch (BaseException e) {
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
-            logger.error("system internalError, modifyCandidate input params: userId={}, candidateId={}, candidateName={}. internalError msg: {}", userId, candidateId, candidateName, e.getMessage());
+            logger.error("system internalError, modifyCandidate input params: userId={}, candidateId={}, candidateName={}, status={}. internalError msg: {}", userId, candidateId, candidateName, status, e.getMessage());
             return BaseResponse.internalError();
         }
     }

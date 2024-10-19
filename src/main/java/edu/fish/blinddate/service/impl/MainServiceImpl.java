@@ -131,7 +131,7 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public void modifyCandidate(Integer userId, Integer candidateId, String candidateName) throws BaseException {
+    public void modifyCandidate(Integer userId, Integer candidateId, String candidateName, Integer status) throws BaseException {
         if (candidateId == null) {
             throw new BaseException(ResponseEnum.MISSING_PARAMS);
         }
@@ -148,6 +148,7 @@ public class MainServiceImpl implements MainService {
         }
 
         candidate.setName(candidateName);
+        candidate.setStatus(status);
         candidateRepository.save(candidate);
     }
 
@@ -434,7 +435,7 @@ public class MainServiceImpl implements MainService {
         BeanUtils.copyProperties(candidateReport, candidateReportVO);
 
         if (candidateReport.getUpdateTime() != null) {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             candidateReportVO.setUpdateTime(simpleDateFormat.format(candidateReport.getUpdateTime()));
         }
 

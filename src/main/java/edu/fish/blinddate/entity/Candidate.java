@@ -25,6 +25,9 @@ public class Candidate {
     @Column(name = "name", columnDefinition = "varchar(64) COMMENT '相亲对象名字'",nullable = false)
     private String name;
 
+    @Column(name = "status", columnDefinition = "int DEFAULT 0 COMMENT '是否公开 默认0不公开 1公开'",nullable = false)
+    private Integer status;
+
     @CreatedDate
     @Column(name = "create_time", columnDefinition = "DATETIME COMMENT '创建时间'")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

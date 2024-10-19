@@ -16,7 +16,7 @@ public interface MainService {
 
     void addCandidate(Integer userId, String candidateName) throws BaseException;
 
-    void modifyCandidate(Integer userId, Integer candidateId, String candidateName) throws BaseException;
+    void modifyCandidate(Integer userId, Integer candidateId, String candidateName, Integer status) throws BaseException;
 
     void removeCandidate(Integer userId, Integer candidateId) throws BaseException;
 
