@@ -8,6 +8,7 @@ import edu.fish.blinddate.utils.UserContext;
 import edu.fish.blinddate.vo.BlindDateRecordVO;
 import edu.fish.blinddate.vo.CandidateReportVO;
 import edu.fish.blinddate.vo.CandidateVO;
+import edu.fish.blinddate.vo.ShareMomentVO;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -177,6 +178,18 @@ public class MainController {
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
             logger.error("system internalError, getCandidateReport input params: userId={}, candidateId={}. internalError msg: {}", userId, candidateId, e.getMessage());
+            return BaseResponse.internalError();
+        }
+    }
+
+    @RequestMapping(path = "/getShareList", method = RequestMethod.GET)
+    public BaseResponse<List<ShareMomentVO>> getShareList() {
+        Integer userId = UserContext.getUserId();
+        try {
+            List<ShareMomentVO> ShareMomentVOList = mainService.getShareList();
+            return BaseResponse.successData(ShareMomentVOList);
+        } catch (Exception e) {
+            logger.error("system internalError, getShareList, userId={}. internalError msg: {}", userId, e.getMessage());
             return BaseResponse.internalError();
         }
     }

@@ -2,6 +2,7 @@ package edu.fish.blinddate.service.impl;
 
 import com.alibaba.fastjson2.util.DateUtils;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import edu.fish.blinddate.dto.BlindDateRecordDTO;
 import edu.fish.blinddate.entity.*;
@@ -18,6 +19,7 @@ import edu.fish.blinddate.service.MainService;
 import edu.fish.blinddate.vo.BlindDateRecordVO;
 import edu.fish.blinddate.vo.CandidateReportVO;
 import edu.fish.blinddate.vo.CandidateVO;
+import edu.fish.blinddate.vo.ShareMomentVO;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -448,5 +450,35 @@ public class MainServiceImpl implements MainService {
         }
 
         return candidateReportVO;
+    }
+
+    @Override
+    public List<ShareMomentVO> getShareList() {
+        // 获取候选人记录
+        Candidate query = new Candidate();
+        query.setStatus(1);
+        Example<Candidate> example = Example.of(query);
+        List<Candidate> candidateList = candidateRepository.findAll(example);
+
+        List<Integer> userIdList = candidateList.stream().map(Candidate::getUserId).toList();
+
+        List<User> userList = userRepository.findByIdIn(userIdList);
+
+        Map<Integer, User> userIdMapUser = Maps.newHashMap();
+
+        userList.forEach(v -> userIdMapUser.put(v.getId(), v));
+
+        List<ShareMomentVO> ShareMomentVOList = Lists.newArrayList();
+        for (Candidate candidate : candidateList) {
+            ShareMomentVO shareMomentVO = new ShareMomentVO();
+            shareMomentVO.setUserId(candidate.getUserId());
+            shareMomentVO.setUserName(userIdMapUser.getOrDefault(candidate.getUserId(), new User()).getUserName());
+            shareMomentVO.setCandidateId(candidate.getId());
+            shareMomentVO.setCandidateName(candidate.getName());
+
+            ShareMomentVOList.add(shareMomentVO);
+        }
+
+        return ShareMomentVOList;
     }
 }
