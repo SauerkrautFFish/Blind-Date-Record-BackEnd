@@ -1,10 +1,7 @@
 package edu.fish.blinddate.service;
 
 import edu.fish.blinddate.exception.BaseException;
-import edu.fish.blinddate.vo.BlindDateRecordVO;
-import edu.fish.blinddate.vo.CandidateReportVO;
-import edu.fish.blinddate.vo.CandidateVO;
-import edu.fish.blinddate.vo.ShareMomentVO;
+import edu.fish.blinddate.vo.*;
 
 import java.util.List;
 
@@ -32,4 +29,6 @@ public interface MainService {
     CandidateReportVO getAnalysisCandidateReport(Integer userId, Integer candidateId) throws BaseException;
 
     List<ShareMomentVO> getShareList();
+
+    ShareMomentDetailVO getShareDetail(Integer shareUserId, Integer shareCandidateId) throws BaseException;
 }

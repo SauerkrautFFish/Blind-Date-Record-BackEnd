@@ -27,6 +27,8 @@ public enum ResponseEnum {
     GENERATING_REPORT(29, "报告正在生成中"),
 
     REPORT_NOT_EXISTS(30, "报告不存在"),
+
+    INFO_NOT_PUBLIC_STATUS(30, "信息是非公开状态"),
     ;
 
     private final int code;

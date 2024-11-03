@@ -16,10 +16,7 @@ import edu.fish.blinddate.repository.CandidateReportRepository;
 import edu.fish.blinddate.repository.CandidateRepository;
 import edu.fish.blinddate.repository.UserRepository;
 import edu.fish.blinddate.service.MainService;
-import edu.fish.blinddate.vo.BlindDateRecordVO;
-import edu.fish.blinddate.vo.CandidateReportVO;
-import edu.fish.blinddate.vo.CandidateVO;
-import edu.fish.blinddate.vo.ShareMomentVO;
+import edu.fish.blinddate.vo.*;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -480,5 +477,30 @@ public class MainServiceImpl implements MainService {
         }
 
         return ShareMomentVOList;
+    }
+
+    @Override
+    public ShareMomentDetailVO getShareDetail(Integer shareUserId, Integer shareCandidateId) throws BaseException {
+        // 判断是否是share
+        Candidate query = new Candidate();
+        query.setId(shareCandidateId);
+        query.setUserId(shareUserId);
+        Example<Candidate> candidateExample = Example.of(query);
+        Candidate candidate = candidateRepository.findOne(candidateExample).orElse(null);
+        if (candidate == null) {
+            throw new BaseException(ResponseEnum.CANDIDATE_DONT_EXISTS);
+        }
+
+        if(candidate.getStatus() != 1) {
+            throw new BaseException(ResponseEnum.INFO_NOT_PUBLIC_STATUS);
+        }
+
+        BlindDateRecordVO blindDateRecordVO = this.getCandidateBlindRecord(shareUserId, shareCandidateId);
+        CandidateReportVO candidateReportVO = this.getAnalysisCandidateReport(shareUserId, shareCandidateId);
+
+        ShareMomentDetailVO shareMomentDetailVO = new ShareMomentDetailVO();
+        shareMomentDetailVO.setBlindDateRecordVO(blindDateRecordVO);
+        shareMomentDetailVO.setCandidateReportVO(candidateReportVO);
+        return shareMomentDetailVO;
     }
 }

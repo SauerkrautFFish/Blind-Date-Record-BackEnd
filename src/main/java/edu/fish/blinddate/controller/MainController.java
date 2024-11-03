@@ -5,10 +5,7 @@ import edu.fish.blinddate.response.BaseResponse;
 import edu.fish.blinddate.service.MainService;
 import edu.fish.blinddate.utils.JWTUtil;
 import edu.fish.blinddate.utils.UserContext;
-import edu.fish.blinddate.vo.BlindDateRecordVO;
-import edu.fish.blinddate.vo.CandidateReportVO;
-import edu.fish.blinddate.vo.CandidateVO;
-import edu.fish.blinddate.vo.ShareMomentVO;
+import edu.fish.blinddate.vo.*;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -194,8 +191,30 @@ public class MainController {
         }
     }
 
-    @RequestMapping(path = "/test", method = RequestMethod.GET)
-    public void a(Integer candidateId, Integer userId) {
+    @RequestMapping(path = "/getShareDetail", method = RequestMethod.GET)
+    public BaseResponse<ShareMomentDetailVO> getShareDetail(Integer shareUserId, Integer shareCandidateId) {
+        // Integer userId = UserContext.getUserId();
+        try {
+            ShareMomentDetailVO shareMomentDetailVO = mainService.getShareDetail(shareUserId, shareCandidateId);
+            return BaseResponse.successData(shareMomentDetailVO);
+        } catch (BaseException e) {
+            return BaseResponse.set(e.getCodeAndMsg());
+        } catch (Exception e) {
+            logger.error("system internalError, getShareDetail, shareUserId={}, shareCandidateId={}. internalError msg: {}", shareUserId, shareCandidateId, e.getMessage());
+            return BaseResponse.internalError();
+        }
+    }
 
+    @RequestMapping(path = "/test", method = RequestMethod.GET)
+    public BaseResponse<ShareMomentDetailVO> a(Integer candidateId, Integer userId) {
+        // Integer userId = UserContext.getUserId();
+        try {
+            ShareMomentDetailVO shareMomentDetailVO = mainService.getShareDetail(userId, candidateId);
+            return BaseResponse.successData(shareMomentDetailVO);
+        } catch (Exception e) {
+            System.out.println(e);
+            // logger.error("system internalError, getShareDetail, shareUserId={}, shareCandidateId={}. internalError msg: {}", shareUserId, shareCandidateId, e.getMessage());
+            return BaseResponse.internalError();
+        }
     }
 }
