@@ -33,9 +33,10 @@ public class MainController {
 
             return BaseResponse.success();
         } catch (BaseException e) {
+            logger.error("register business error, params[newAccount={}, newPassword={}, userName={}]. err msg: {}", newAccount, newPassword, userName, e.getMessage());
             return BaseResponse.set(e.getCodeAndMsg());
         } catch (Exception e) {
-            logger.error("system internalError, register input params: newAccount={}, newPassword={}, userName={}. internalError msg: {}", newAccount, newPassword, userName, e.getMessage());
+            logger.error("register system error, params[newAccount={}, newPassword={}, userName={}]. error msg: {}", newAccount, newPassword, userName, e.getMessage());
             return BaseResponse.internalError();
         }
     }
@@ -47,9 +48,10 @@ public class MainController {
             String token = JWTUtil.getJwtToken(userId);
             return BaseResponse.successData(token);
         } catch (BaseException e) {
+            logger.error("login business error, params[account={}, password={}]. err msg: {}", account, password, e.getMessage());
             return BaseResponse.set(e.getCodeAndMsg());
         } catch (Exception e) {
-            logger.error("system internalError, login input params: account={}, password={}. internalError msg: {}", account, password, e.getMessage());
+            logger.error("login system error, params[account={}, password={}]. error msg: {}", account, password, e.getMessage());
             return BaseResponse.internalError();
         }
 
@@ -62,7 +64,7 @@ public class MainController {
             List<CandidateVO> candidateVOList = mainService.getCandidateListByUserId(userId);
             return BaseResponse.successData(candidateVOList);
         } catch (Exception e) {
-            logger.error("system internalError, getCandidateList input params: userId={}. internalError msg: {}", userId, e.getMessage());
+            logger.error("getCandidateList system error, params[userId={}]. error msg: {}", userId, e.getMessage());
             return BaseResponse.internalError();
         }
     }
@@ -74,9 +76,10 @@ public class MainController {
             mainService.addCandidate(userId, candidateName);
             return BaseResponse.success();
         } catch (BaseException e) {
+            logger.error("addCandidate business error, params[userId={}, candidateName={}]. err msg: {}", userId, candidateName, e.getMessage());
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
-            logger.error("system internalError, addCandidate input params: userId={}, candidateName={}. internalError msg: {}", userId, candidateName, e.getMessage());
+            logger.error("addCandidate system error, params[userId={}, candidateName={}]. error msg: {}", userId, candidateName, e.getMessage());
             return BaseResponse.internalError();
         }
     }
@@ -88,9 +91,10 @@ public class MainController {
             mainService.modifyCandidate(userId, candidateId, candidateName, status);
             return BaseResponse.success();
         } catch (BaseException e) {
+            logger.error("modifyCandidate business error, params[userId={}, candidateId={}, candidateName={}, status={}]. err msg: {}", userId, candidateId, candidateName, status, e.getMessage());
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
-            logger.error("system internalError, modifyCandidate input params: userId={}, candidateId={}, candidateName={}, status={}. internalError msg: {}", userId, candidateId, candidateName, status, e.getMessage());
+            logger.error("modifyCandidate system error, params[userId={}, candidateId={}, candidateName={}, status={}]. error msg: {}", userId, candidateId, candidateName, status, e.getMessage());
             return BaseResponse.internalError();
         }
     }
@@ -102,9 +106,10 @@ public class MainController {
             mainService.removeCandidate(userId, candidateId);
             return BaseResponse.success();
         } catch (BaseException e) {
+            logger.error("removeCandidate business error, params[userId={}, candidateId={}]. err msg: {}", userId, candidateId, e.getMessage());
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
-            logger.error("system internalError, removeCandidate input params: userId={}, candidateId={}. internalError msg: {}", userId, candidateId, e.getMessage());
+            logger.error("removeCandidate system error, params[userId={}, candidateId={}]. error msg: {}", userId, candidateId, e.getMessage());
             return BaseResponse.internalError();
         }
     }
@@ -116,9 +121,10 @@ public class MainController {
             BlindDateRecordVO blindDateRecordVO = mainService.getCandidateBlindRecord(userId, candidateId);
             return BaseResponse.successData(blindDateRecordVO);
         } catch (BaseException e) {
+            logger.error("getCandidateBlindRecord business error, params[userId={}, candidateId={}]. err msg: {}", userId, candidateId, e.getMessage());
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
-            logger.error("system internalError, getCandidateBlindRecord input params: userId={}, candidateId={}. internalError msg: {}", userId, candidateId, e.getMessage());
+            logger.error("getCandidateBlindRecord system error, params[userId={}, candidateId={}]. error msg: {}", userId, candidateId, e.getMessage());
             return BaseResponse.internalError();
         }
     }
@@ -130,9 +136,10 @@ public class MainController {
             mainService.setCandidateBlindRecord(userId, blindDateRecordVO);
             return BaseResponse.success();
         } catch (BaseException e) {
+            logger.error("setCandidateBlindRecord business error, params[userId={}, blindDateRecordVO={}]. err msg: {}", userId, blindDateRecordVO, e.getMessage());
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
-            logger.error("system internalError, setCandidateBlindRecord input params: userId={}, blindDateRecordVO={}. internalError msg: {}", userId, blindDateRecordVO, e.getMessage());
+            logger.error("setCandidateBlindRecord system error, params[userId={}, blindDateRecordVO={}]. error msg: {}", userId, blindDateRecordVO, e.getMessage());
             return BaseResponse.internalError();
         }
     }
@@ -144,23 +151,25 @@ public class MainController {
             List<String> nameList = mainService.getFocusOnRank(userId, youFlag, rankingListLength);
             return BaseResponse.successData(nameList);
         } catch (BaseException e) {
+            logger.error("getFocusOnRank business error, params[userId={}, rankingListLength={}, youFlag={}]. err msg: {}", userId, rankingListLength, youFlag, e.getMessage());
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
-            logger.error("system internalError, getFocusOnRank input params: userId={}, rankingListLength={}, youFlag={}, internalError msg: {}", userId, rankingListLength, youFlag, e.getMessage());
+            logger.error("getFocusOnRank system error, params[userId={}, rankingListLength={}, youFlag={}]. err msg: {}", userId, rankingListLength, youFlag, e.getMessage());
             return BaseResponse.internalError();
         }
     }
 
     @RequestMapping(path = "/analyzeCandidate", method = RequestMethod.GET)
-    public BaseResponse<Object> generateAnalysisCandidateReport(Integer candidateId) {
+    public BaseResponse<Object> analyzeCandidate(Integer candidateId) {
         Integer userId = UserContext.getUserId();
         try {
             mainService.generateAnalysisCandidateReport(userId, candidateId);
             return BaseResponse.success();
         } catch (BaseException e) {
+            logger.error("analyzeCandidate business error, params[userId={}, candidateId={}]. err msg: {}", userId, candidateId, e.getMessage());
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
-            logger.error("system internalError, analyzeCandidate input params: userId={}, candidateId={}. internalError msg: {}", userId, candidateId, e.getMessage());
+            logger.error("analyzeCandidate system error, params[userId={}, candidateId={}]. err msg: {}", userId, candidateId, e.getMessage());
             return BaseResponse.internalError();
         }
     }
@@ -172,9 +181,10 @@ public class MainController {
             CandidateReportVO candidateReportVO = mainService.getAnalysisCandidateReport(userId, candidateId);
             return BaseResponse.successData(candidateReportVO);
         } catch (BaseException e) {
+            logger.error("getCandidateReport business error, params[userId={}, candidateId={}]. err msg: {}", userId, candidateId, e.getMessage());
             return BaseResponse.set(e.getCodeAndMsg());
         }  catch (Exception e) {
-            logger.error("system internalError, getCandidateReport input params: userId={}, candidateId={}. internalError msg: {}", userId, candidateId, e.getMessage());
+            logger.error("getCandidateReport system error, params[userId={}, candidateId={}]. err msg: {}", userId, candidateId, e.getMessage());
             return BaseResponse.internalError();
         }
     }
@@ -186,7 +196,7 @@ public class MainController {
             List<ShareMomentVO> ShareMomentVOList = mainService.getShareList();
             return BaseResponse.successData(ShareMomentVOList);
         } catch (Exception e) {
-            logger.error("system internalError, getShareList, userId={}. internalError msg: {}", userId, e.getMessage());
+            logger.error("getShareList system error, params[userId={}]. err msg: {}", userId, e.getMessage());
             return BaseResponse.internalError();
         }
     }
@@ -198,22 +208,10 @@ public class MainController {
             ShareMomentDetailVO shareMomentDetailVO = mainService.getShareDetail(shareUserId, shareCandidateId);
             return BaseResponse.successData(shareMomentDetailVO);
         } catch (BaseException e) {
+            logger.error("getShareDetail business error, params[shareUserId={}, shareCandidateId={}]. err msg: {}", shareUserId, shareCandidateId, e.getMessage());
             return BaseResponse.set(e.getCodeAndMsg());
         } catch (Exception e) {
-            logger.error("system internalError, getShareDetail, shareUserId={}, shareCandidateId={}. internalError msg: {}", shareUserId, shareCandidateId, e.getMessage());
-            return BaseResponse.internalError();
-        }
-    }
-
-    @RequestMapping(path = "/test", method = RequestMethod.GET)
-    public BaseResponse<ShareMomentDetailVO> a(Integer candidateId, Integer userId) {
-        // Integer userId = UserContext.getUserId();
-        try {
-            ShareMomentDetailVO shareMomentDetailVO = mainService.getShareDetail(userId, candidateId);
-            return BaseResponse.successData(shareMomentDetailVO);
-        } catch (Exception e) {
-            System.out.println(e);
-            // logger.error("system internalError, getShareDetail, shareUserId={}, shareCandidateId={}. internalError msg: {}", shareUserId, shareCandidateId, e.getMessage());
+            logger.error("getShareDetail system error, params[shareUserId={}, shareCandidateId={}]. err msg: {}", shareUserId, shareCandidateId, e.getMessage());
             return BaseResponse.internalError();
         }
     }
