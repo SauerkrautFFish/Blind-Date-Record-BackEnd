@@ -40,7 +40,7 @@ public class JWTUtil {
     }
 
     public static Integer getUserIdByJwtToken(String jwtToken) {
-        if(jwtToken == null) return null;
+        if(jwtToken == null || jwtToken.equals("")) return null;
 
         try {
             Jws<Claims> claimsJws = Jwts.parser().setSigningKey(signKey).parseClaimsJws(jwtToken);
