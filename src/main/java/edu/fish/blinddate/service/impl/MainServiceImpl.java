@@ -118,6 +118,7 @@ public class MainServiceImpl implements MainService {
         Candidate candidate = new Candidate();
         candidate.setUserId(userId);
         candidate.setName(candidateName);
+        candidate.setStatus(0);
         candidateRepository.save(candidate);
 
         BlindDateRecord blindDateRecord = new BlindDateRecord();
